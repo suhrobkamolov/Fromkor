@@ -1,0 +1,10 @@
+django
+django-extensions
+django-heroku
+dj-database-url
+python-dotenv
+pydotplus
+psycopg2
+psycopg2-binary==2.8.6
+whitenoise
+secret-key-generator
