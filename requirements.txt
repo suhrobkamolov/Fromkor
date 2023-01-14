@@ -8,3 +8,9 @@ psycopg2
 psycopg2-binary==2.8.6
 whitenoise
 secret-key-generator
+django-multiselectfield
+django-money
+django-address
+django-image-cropping
+django-phone-field
+django-ckeditor
