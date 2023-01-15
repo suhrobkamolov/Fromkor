@@ -50,8 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mainhome'
-    'Movies'
+    'mainhome',
+    'Movies',
 ]
 
 MIDDLEWARE = [
@@ -136,8 +136,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/staticfiles/'
 # STATIC_URL = 'static/'
 # STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['staticfiles']))
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # MEDIA_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep)['media']))
 
 
