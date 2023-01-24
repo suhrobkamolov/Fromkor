@@ -14,3 +14,5 @@ django-address
 django-image-cropping
 django-phone-field
 django-ckeditor
+django-allauth == 0.43.0
+pillow
