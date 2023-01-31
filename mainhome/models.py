@@ -17,7 +17,7 @@ STATUS_CHOICES = (
 
 class Carousel(models.Model):
     title = models.CharField(max_length=140)
-    to_movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    to_movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='CarouselItem')
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='d')
 

@@ -19,102 +19,66 @@
         <div class="container">
             <div class="row">
                 <div class="slider-single-item">
-                    <div class="movie-item">
-                        <div class="row">
-                            <div class="col-md-8 col-sm-12 col-xs-12">
-                                <div class="title-in">
-                                    <div class="cate">
-                                        {% for i in queryset %}
-                                            <span class="blue"><a href="#">{{ i.movie_title }}</a></span>
-
-                                        {% endfor %}
-
-                                        <span class="yell"><a href="#">Action</a></span>
-                                        <span class="orange"><a href="#">advanture</a></span>
-                                    </div>
-                                    <h1><a href="#">guardians of the<br>
-                                    galaxy <span>2015</span></a></h1>
-                                    <div class="social-btn">
-                                        <a href="#" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
-                                        <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
-                                        <div class="hover-bnt">
-                                            <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
-                                            <div class="hvr-item">
-                                                <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                    {% for i in carousel_list %}
+                        {% if i.status != 'd' %}
+                            <div class="movie-item">
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-12 col-xs-12">
+                                        <div class="title-in">
+                                            <div class="cate">
+                                                {% for j in i.to_movie.movie_genre.all %}
+                                                    {% if j == 'Sci-fi' %}
+                                                        <span class="blue"><a href="#">Sci-fi</a></span>
+                                                    {% elif j == 'Action' %}
+                                                        <span class="yell"><a href="#">Action</a></span>
+                                                    {% elif j == 'Advanture' %}
+                                                        <span class="orange"><a href="#">Advanture</a></span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <h1><a href="#" tabindex="0">{{ i.to_movie.movie_title}}<br>
+                                            <span>{{ i.to_movie.movie_year}}</span></a></h1>
+                                            <div class="social-btn">
+                                                <a href="#" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
+                                                <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
+                                                <div class="hover-bnt">
+                                                    <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
+                                                    <div class="hvr-item">
+                                                        <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
+                                                        <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
+                                                        <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
+                                                        <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mv-details">
+                                                <p><i class="ion-android-star"></i><span>{{ i.to_movie.movie_imdb }}</span> /10</p>
+                                                <ul class="mv-infor">
+                                                    <li>  Run Time: {{ i.to_movie.movie_duration }} </li>
+                                                    <li>  Rated: {{ i.to_movie.movie_MPAA_rating }}  </li>
+                                                    <li>  Release: {{ i.to_movie.movie_release_date }}</li>
+                                                </ul>
+                                            </div>
+                                            <div class="btn-transform transform-vertical">
+                                                <div><a href="#" class="item item-1 redbtn">more detail</a></div>
+                                                <div><a href= "#" class="item item-2 redbtn hvrbtn">more detail</a></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mv-details">
-                                        <p><i class="ion-android-star"></i><span>7.4</span> /10</p>
-                                        <ul class="mv-infor">
-                                            <li>  Run Time: 2h21’ </li>
-                                            <li>  Rated: PG-13  </li>
-                                            <li>  Release: 1 May 2015</li>
-                                        </ul>
-                                    </div>
-                                    <div class="btn-transform transform-vertical">
-                                        <div><a href="#" class="item item-1 redbtn">more detail</a></div>
-                                        <div><a href= "#" class="item item-2 redbtn hvrbtn">more detail</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                <div class="mv-img-2">
-                                    <a href="#"><img src="images/uploads/poster1.jpg" alt=""></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="movie-item">
-                        <div class="row">
-                            <div class="col-md-8 col-sm-12 col-xs-12">
-                                <div class="title-in">
-                                    <div class="cate">
-                                        <span class="blue"><a href="#">Sci-fi</a></span>
-                                        <span class="yell"><a href="#">Action</a></span>
-                                        <span class="orange"><a href="#">advanture</a></span>
-                                    </div>
-                                    <h1><a href="#">guardians of the<br>
-                                    galaxy <span>2015</span></a></h1>
-                                    <div class="social-btn">
-                                        <a href="#" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
-                                        <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
-                                        <div class="hover-bnt">
-                                            <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
-                                            <div class="hvr-item">
-                                                <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
-                                                <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
-                                            </div>
+                                    <div class="col-md-4 col-sm-12 col-xs-12">
+                                        <div class="mv-img-2">
+                                            <a href="#"><img src="{{ i.to_movie.movie_image }}" alt="movie"></a>
                                         </div>
                                     </div>
-                                    <div class="mv-details">
-                                        <p><i class="ion-android-star"></i><span>7.4</span> /10</p>
-                                        <ul class="mv-infor">
-                                            <li>  Run Time: 2h21’ </li>
-                                            <li>  Rated: PG-13  </li>
-                                            <li>  Release: 1 May 2015</li>
-                                        </ul>
-                                    </div>
-                                    <div class="btn-transform transform-vertical">
-                                        <div><a href="#" class="item item-1 redbtn">more detail</a></div>
-                                        <div><a href= "#" class="item item-2 redbtn hvrbtn">more detail</a></div>
-                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {{ i.movie_title }}
+                        {# Second Moveie #}
+                    {% endfor %}
 
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                <div class="mv-img-2">
-                                    <a href="#"><img src="images/uploads/poster1.jpg" alt=""></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+
             </div>
         </div>
     </div>

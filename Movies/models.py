@@ -4,6 +4,8 @@ from django.utils.text import slugify
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
+from django.dispatch import receiver
+from PIL import Image
 
 # Create your models here.
 
@@ -148,7 +150,7 @@ class Movie(models.Model):
     movie_topic = models.CharField(max_length=120)
     movie_language = models.CharField(choices=STATUS_CHOICES, default=":)", max_length=120)
     movie_actors = models.ManyToManyField(Actor, default='/N')
-    movie_image = models.FileField(upload_to='templates/images/movies/', null=True, blank=True)
+    movie_image = models.ImageField(upload_to='media/mainhome/static/images/Movies/', null=True, blank=True)
     thumb_url = models.CharField(max_length=500, null=True, blank=True)
     thumb = models.FileField(upload_to='images/products/%Y/%m/%d', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -172,6 +174,13 @@ class Movie(models.Model):
     def get_absolute_url(self):
         return reverse('products:product_detail', args=[self.slug])
 
+    # Changing Movie image size before upload
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        image = Image.open(self.movie_image.path)
+        image = image.resize((185, 284), Image.ANTIALIAS)
+        image.save(self.movie_image.path)
+
 
 class Comment(models.Model):
     product = models.ForeignKey(Movie, on_delete=models.CASCADE)
@@ -193,8 +202,13 @@ def pre_save_slug(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
 
+# Changing Movie image size before upload
+
 
 pre_save.connect(pre_save_slug, sender=Movie)
+
+
+
 
 
 
