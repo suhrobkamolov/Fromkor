@@ -1,9 +1,16 @@
 {% extends 'head.html' %}
 {% block head_title %}SUHA{% endblock %}
 {% block content %}
-
+{% load static %}
     <!--preloading-->
-
+    <div id="preloader">
+        <img class="logo" src="{% static 'images/logo-no-background.png' %}" alt="" width="500" height="95">
+        <div id="status">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <!--end of preloading-->
     <!--end of preloading-->
     <!--login form popup-->
 
@@ -14,7 +21,7 @@
 
     <!-- BEGIN | Header -->
     <!-- END | Header -->
-
+    <!-- START | SLIDER -->
     <div class="slider sliderv2">
         <div class="container">
             <div class="row">
@@ -27,19 +34,41 @@
                                         <div class="title-in">
                                             <div class="cate">
                                                 {% for j in i.to_movie.movie_genre.all %}
-                                                    {% if j == 'Sci-fi' %}
+                                                    {% if j.title == 'Sci-fi' %}
                                                         <span class="blue"><a href="#">Sci-fi</a></span>
-                                                    {% elif j == 'Action' %}
+                                                    {% elif j.title == 'Action' %}
                                                         <span class="yell"><a href="#">Action</a></span>
-                                                    {% elif j == 'Advanture' %}
+                                                    {% elif j.title == 'Advanture' %}
                                                         <span class="orange"><a href="#">Advanture</a></span>
+                                                    {% elif j.title == 'Animated' %}
+                                                        <span class="blue"><a href="#">Animation</a></span>
+                                                    {% elif j.title == 'Comedy' %}
+                                                        <span class="yell"><a href="#">Comedy</a></span>
+                                                    {% elif j.title == 'Crime' %}
+                                                        <span class="green"><a href="#">Crime</a></span>
+                                                    {% elif j.title == 'Drama' %}
+                                                        <span class="blue"><a href="#">Drama</a></span>
+                                                    {% elif j.title == 'Fantasy' %}
+                                                        <span class="yell"><a href="#">Fantasy</a></span>
+                                                    {% elif j.title == 'Historical' %}
+                                                        <span class="orange"><a href="#">Historical</a></span>
+                                                    {% elif j.title == 'Horror' %}
+                                                        <span class="blue"><a href="#">Horror</a></span>
+                                                    {% elif j.title == 'Musical' %}
+                                                        <span class="yell"><a href="#">Musical</a></span>
+                                                    {% elif j.title == 'Romance' %}
+                                                        <span class="orange"><a href="#">Romance</a></span>
+                                                    {% elif j.title == 'Thriller' %}
+                                                        <span class="yell"><a href="#">Thriller</a></span>
+                                                    {% elif j.title == 'Western' %}
+                                                        <span class="orange"><a href="#">Western</a></span>
                                                     {% endif %}
                                                 {% endfor %}
                                             </div>
                                             <h1><a href="#" tabindex="0">{{ i.to_movie.movie_title}}<br>
                                             <span>{{ i.to_movie.movie_year}}</span></a></h1>
                                             <div class="social-btn">
-                                                <a href="#" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
+                                                <a href="{{ i.to_movie.movie_trailer_url }}" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
                                                 <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
                                                 <div class="hover-bnt">
                                                     <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
@@ -67,14 +96,12 @@
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xs-12">
                                         <div class="mv-img-2">
-                                            <a href="#"><img src="{{ i.to_movie.movie_image }}" alt="movie"></a>
+                                            <a href="#"><img src="{{ i.to_movie.movie_image.url }}" alt="movie"></a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
-                        {{ i.movie_title }}
-                        {# Second Moveie #}
                     {% endfor %}
 
                 </div>
@@ -82,38 +109,43 @@
             </div>
         </div>
     </div>
+    <!-- END | SLIDER -->
+
+    <!-- START | MOVIES -->
     <div class="movie-items  full-width">
         <div class="row">
             <div class="col-md-12">
                 <div class="title-hd">
-                    <h2>in theater</h2>
+                    <h2>most watched</h2>
                     <a href="#" class="viewall">View all <i class="ion-ios-arrow-right"></i></a>
                 </div>
                 <div class="tabs">
                     <ul class="tab-links">
-                        <li class="active"><a href="#tab1-h2">#Popular</a></li>
-                        <li><a href="#tab2-h2"> #Coming soon</a></li>
-                        <li><a href="#tab3-h2">  #Top rated  </a></li>
-                        <li><a href="#tab4-h2"> #Most reviewed</a></li>
+                        <li class="active"><a href="#tab1-h2">#All</a></li>
+                        <li><a href="#tab2-h2"> #Movies</a></li>
+                        <li><a href="#tab3-h2">  #Tv-Series  </a></li>
+                        <!--<li><a href="#tab4-h2"> #Most reviewed</a></li>-->
                     </ul>
                     <div class="tab-content">
                         <div id="tab1-h2" class="tab active">
                             <div class="row">
                                 <div class="slick-multiItem2">
-                                    <div class="slide-it">
-                                        <div class="movie-item">
-                                            <div class="mv-img">
-                                                <img src="images/uploads/mv-it1.jpg" alt="">
-                                            </div>
-                                            <div class="hvr-inner">
-                                                <a  href="moviesingle.html"> Read more <i class="ion-android-arrow-dropright"></i> </a>
-                                            </div>
-                                            <div class="title-in">
-                                                <h6><a href="#">Interstellar</a></h6>
-                                                <p><i class="ion-android-star"></i><span>7.4</span> /10</p>
+                                    {% for i in object_list %}
+                                        <div class="slide-it">
+                                            <div class="movie-item">
+                                                <div class="mv-img">
+                                                    <img src="{{i.movie_image.url}}" alt="{{ i.movie_title }}">
+                                                </div>
+                                                <div class="hvr-inner">
+                                                    <a  href="{{ i.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
+                                                </div>
+                                                <div class="title-in">
+                                                    <h6><a href="#">{{ i.movie_title }}</a></h6>
+                                                    <p><i class="ion-android-star"></i><span>{{ i.movie_imdb }}</span> /10</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endfor %}
                                     <div class="slide-it">
                                         <div class="movie-item">
                                             <div class="mv-img">
@@ -784,7 +816,9 @@
             </div>
         </div>
     </div>
+    <!-- END | MOVIES -->
 
+    <!-- START | TRAILERS -->
     <div class="trailers full-width">
             <div class="row ipad-width">
                 <div class="col-md-9 col-sm-12 col-xs-12">
@@ -910,6 +944,8 @@
             </div>
 
     </div>
+    <!-- END | TRAILERS -->
+
     <!-- latest new v2 section-->
     <div class="latestnew full-width">
             <div class="row">

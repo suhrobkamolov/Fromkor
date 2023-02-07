@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 from django.dispatch import receiver
 from PIL import Image
+import os
 
 # Create your models here.
 
@@ -135,6 +136,14 @@ class Actor(models.Model):
 
 
 class Movie(models.Model):
+
+    def upload_file_name(self, filename):
+        x = self.movie_title
+        characters_to_remove = '<,>,:,",/,\,|,?,*,.'
+        for character in characters_to_remove:
+            x = x.replace(character, "")
+        return f'movies/{x}/images/{filename}'
+
     slug = models.SlugField(unique=True)
     movie_title = models.CharField(max_length=120)
     movie_year = models.PositiveIntegerField(default=2023,
@@ -150,9 +159,10 @@ class Movie(models.Model):
     movie_topic = models.CharField(max_length=120)
     movie_language = models.CharField(choices=STATUS_CHOICES, default=":)", max_length=120)
     movie_actors = models.ManyToManyField(Actor, default='/N')
-    movie_image = models.ImageField(upload_to='media/mainhome/static/images/Movies/', null=True, blank=True)
+    movie_image = models.ImageField(upload_to=upload_file_name, null=True, blank=True)
     thumb_url = models.CharField(max_length=500, null=True, blank=True)
-    thumb = models.FileField(upload_to='images/products/%Y/%m/%d', null=True, blank=True)
+    thumb = models.FileField(upload_to='movies/images', null=True, blank=True)
+    movie_trailer_url = models.CharField(max_length=500, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     movie_status = models.CharField(max_length=120, null=True, blank=True)
@@ -172,13 +182,13 @@ class Movie(models.Model):
         return self.movie_title
 
     def get_absolute_url(self):
-        return reverse('products:product_detail', args=[self.slug])
+        return reverse('Movie_Watch_View', args=[str(self.slug)])
 
     # Changing Movie image size before upload
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         image = Image.open(self.movie_image.path)
-        image = image.resize((185, 284), Image.ANTIALIAS)
+        image = image.resize((285, 437), Image.ANTIALIAS)
         image.save(self.movie_image.path)
 
 
@@ -202,7 +212,23 @@ def pre_save_slug(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
 
-# Changing Movie image size before upload
+# Deleting Movie image before upload new one
+
+
+# @receiver(pre_save, sender=Movie)
+# def pre_save_image(sender, instance, *args, **kwargs):
+#     """ instance old image file will delete from os """
+#     try:
+#         old_img = instance.__class__.objects.get(id=instance.id).movie_image.path
+#         try:
+#             new_img = instance.image.path
+#         except:
+#             new_img = None
+#         if new_img != old_img:
+#             if os.path.exists(old_img):
+#                 os.remove(old_img)
+#     except:
+#         pass
 
 
 pre_save.connect(pre_save_slug, sender=Movie)
