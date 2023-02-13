@@ -192,6 +192,12 @@ class Movie(models.Model):
         image.save(self.movie_image.path)
 
 
+class DailyMovieViews(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    date = models.DateField()
+    views = models.PositiveIntegerField(default=0)
+
+
 class Comment(models.Model):
     product = models.ForeignKey(Movie, on_delete=models.CASCADE)
 

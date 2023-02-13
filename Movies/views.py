@@ -1,16 +1,22 @@
 from django.shortcuts import render, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView
-from .models import Movie
+# from django.views import View
+# from django.views.generic import ListView, DetailView
+from .models import Movie, DailyMovieViews
+from django.utils import timezone
 
 # Create your views here.
 
 
 def watch_movie(request, slug):
     movie = get_object_or_404(Movie, slug=slug)
+    today = timezone.now().date()
+    daily_views, created = DailyMovieViews.objects.get_or_create(movie=movie, date=today)
+    daily_views.views += 1
+    daily_views.save()
     movie.movie_view_count += 1
     movie.save()
     return render(request, 'moviedetailed.html', {'movie': movie})
+
 
 # class MoviesListView(ListView):
 #     model = Movie

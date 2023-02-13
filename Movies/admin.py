@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Company, Producer, Actor, Movie
+from .models import Category, Company, Producer, Actor, Movie, DailyMovieViews
 
 # Register your models here.
 
@@ -32,6 +32,7 @@ admin.site.register(Movie, MovieAdmin)
 admin.site.register(Company)
 admin.site.register(Producer)
 admin.site.register(Actor)
+admin.site.register(DailyMovieViews)
 
 
 
