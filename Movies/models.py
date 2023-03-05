@@ -4,9 +4,9 @@ from django.utils.text import slugify
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
-from django.dispatch import receiver
 from PIL import Image
-import os
+from django.utils.safestring import mark_safe
+
 
 # Create your models here.
 
@@ -22,8 +22,6 @@ STATUS_CHOICES = (
 #     ('MW', 'Most Watched'),
 #     ('TR', 'Top Rated'),
 # )
-
-# G- General Audiences
 
 MPAA = (
     ('G', 'General Audiences'),
@@ -168,7 +166,7 @@ class Movie(models.Model):
     movie_status = models.CharField(max_length=120, null=True, blank=True)
     movie_view_count = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-
+    fetch_data = models.BooleanField(default=False)
     meta_keywords = models.CharField("Meta Keywords", max_length=255,
                                      help_text='Comma-delimited set of SEO keywords for meta tag')
     meta_description = models.CharField("Meta Description", max_length=255,
@@ -202,7 +200,7 @@ class Comment(models.Model):
     product = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
 
-def create_slug(instance, new_slag = None):
+def create_slug(instance, new_slag=None):
     slug = slugify(instance.name)
     if new_slag is not None:
         slug = new_slag
@@ -218,26 +216,126 @@ def pre_save_slug(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
 
-# Deleting Movie image before upload new one
-
-
-# @receiver(pre_save, sender=Movie)
-# def pre_save_image(sender, instance, *args, **kwargs):
-#     """ instance old image file will delete from os """
-#     try:
-#         old_img = instance.__class__.objects.get(id=instance.id).movie_image.path
-#         try:
-#             new_img = instance.image.path
-#         except:
-#             new_img = None
-#         if new_img != old_img:
-#             if os.path.exists(old_img):
-#                 os.remove(old_img)
-#     except:
-#         pass
-
 
 pre_save.connect(pre_save_slug, sender=Movie)
+
+############# TV Series ######################
+
+
+class TVSeries(models.Model):
+    def upload_file_name(self, filename):
+        x = self.title
+        characters_to_remove = '<,>,:,",/,\,|,?,*,.'
+        for character in characters_to_remove:
+            x = x.replace(character, "")
+        return f'tv-series/{x}/images/{filename}'
+
+    imdb_id = models.CharField(max_length=50, blank=True, null=True)
+    title = models.CharField(max_length=200)
+    release_date = models.DateField()
+    release_year = models.CharField(max_length=10, null=True, blank=True)
+    num_seasons = models.PositiveSmallIntegerField()
+    description = models.TextField()
+    genre = models.ManyToManyField(Category, related_name='genres')
+    poster = models.ImageField(upload_to=upload_file_name, null=True, blank=True)
+    poster_url = models.URLField(blank=True, null=True)
+    trailer = models.URLField()
+    rating = models.FloatField()
+    cast = models.ManyToManyField(Actor, related_name='casts')
+    director = models.ManyToManyField(Producer, related_name='directors')
+    episodes = models.ManyToManyField('Episode', related_name='episodes')
+    slug = models.SlugField(max_length=200, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    MPAA_rating = models.CharField(choices=MPAA, max_length=4, default='G')
+    view_count = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    fetch_data = models.BooleanField(default=False)
+    is_continuing = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ('-created',)
+        index_together = (('id', 'slug'),)
+
+    def get_absolute_url(self):
+        return reverse('Series_Watch_View', args=[str(self.slug)])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = create_slug_series(self.title)
+
+    # @property
+    # def detailed_picture_show(self):
+    #     if self.poster:
+    #         return mark_safe(f'<img src={self.poster.url}></img>')
+    #     return mark_safe(f'<h3> No image to show </h3>')
+
+        # if self.poster_url:
+        #     # path = 'media/' + self.upload_file_name(self.title) + '.jpg'
+        #     # parts = path.rsplit('/', 1)
+        #     # result = f"{parts[0]}/{'/'.join(parts[1].split('/')[:-1])}"
+        #     # os.makedirs(result)
+        #     url = self.poster_url
+        #     response = requests.get(url)
+        #     image = Image.open(BytesIO(response.content))
+        #     image = image.resize((285, 437), Image.ANTIALIAS)
+        #     filestream = BytesIO()
+        #     image.save(filestream, 'JPEG')
+        #     filestream.seek(0)
+        #     self.poster.save(self.poster_url.split('/')[-1], File(filestream), save=False)
+
+
+# @receiver(pre_save, sender=TVSeries)
+# def update_tvseries_fields(sender, instance, **kwargs):
+#     if instance.IMDbid:
+#         ia = IMDb()
+#         imdb_data = ia.get_movie(instance.IMDbid)
+#         genres = imdb_data['genres']
+#
+#         # populate other fields based on retrieved data
+#         # instance.genre.set([Category.objects.get_or_create(name=genre)[0] for genre in genres])
+#         instance.name = imdb_data.get('title')
+#         # instance.release_date = imdb_data.get('year')
+#         instance.num_seasons = imdb_data['seasons']
+#         instance.description = imdb_data.get('plot outline')
+#         instance.poster_url = imdb_data.get('full-size cover url')
+#         instance.rating = imdb_data.get('rating')
+#         # instance.trailer = imdb_data.get('trailer')
+
+
+class Episode(models.Model):
+    imdb_id = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=200)
+    tv_series = models.ForeignKey(TVSeries, on_delete=models.CASCADE, default=1)
+    season = models.PositiveSmallIntegerField()
+    episode_number = models.PositiveSmallIntegerField()
+    duration = models.DurationField()
+    description = models.TextField()
+    episode_view_count = models.PositiveIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} (Season {self.season}, Episode {self.episode_number})"
+
+
+class DailySeriesViews(models.Model):
+    tv_series = models.ForeignKey(TVSeries, on_delete=models.CASCADE)
+    date = models.DateField()
+    views = models.PositiveIntegerField(default=0)
+
+
+def create_slug_series(title):
+    # Generate a slug from the title using Django's slugify function
+    slug = slugify(title)
+    # Limit the slug length to 50 characters
+    slug = slug[:50]
+    return slug
+
 
 
 
