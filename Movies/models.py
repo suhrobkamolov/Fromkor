@@ -32,7 +32,7 @@ MPAA = (
 )
 
 
-class Category(models.Model):
+class Genre(models.Model):
     title = models.CharField(max_length=140)
     slug = models.SlugField(max_length=200, db_index=True, unique=True)
     description = models.TextField()
@@ -44,14 +44,14 @@ class Category(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'Genre'
+        verbose_name_plural = 'Genres'
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('products:product_list_by_category', args=[self.slug])
+        return reverse('movie:movie_list_by_genres', args=[self.slug])
 
 
 class Company(models.Model):
@@ -73,7 +73,7 @@ class Company(models.Model):
         return self.company_name
 
     def get_absolute_url(self):
-        return reverse('products:product_list_by_category', args=[self.company_slug])
+        return reverse('movie:movie_list_by_company', args=[self.company_slug])
 
 # Producer model
 
@@ -102,7 +102,7 @@ class Producer(models.Model):
         return self.producer_name
 
     def get_absolute_url(self):
-        return reverse('products:product_list_by_category', args=[self.producer_slug])
+        return reverse('producer:product_list_by_producer', args=[self.producer_slug])
 
 # Actor model
 
@@ -130,7 +130,7 @@ class Actor(models.Model):
         return self.actor_name
 
     def get_absolute_url(self):
-        return reverse('products:product_list_by_category', args=[self.actor_slug])
+        return reverse('movies:movies_list_by_actor', args=[self.actor_slug])
 
 
 class Movie(models.Model):
@@ -150,7 +150,7 @@ class Movie(models.Model):
     movie_release_date = models.DateField()
     movie_duration = models.CharField(max_length=50, help_text='1h 20m')
     movie_MPAA_rating = models.CharField(choices=MPAA, max_length=4, default='G')
-    movie_genre = models.ManyToManyField(Category, default='UNDEFINED')
+    movie_genre = models.ManyToManyField(Genre, default='UNDEFINED')
     movie_imdb = models.FloatField(default=5.0)
     movie_producer = models.ManyToManyField(Producer, default='UNDEFINED')
     movie_company = models.ManyToManyField(Company, default='UNDEFINED')
@@ -236,14 +236,14 @@ class TVSeries(models.Model):
     release_year = models.CharField(max_length=10, null=True, blank=True)
     num_seasons = models.PositiveSmallIntegerField()
     description = models.TextField()
-    genre = models.ManyToManyField(Category, related_name='genres')
+    genre = models.ManyToManyField(Genre, related_name='genres')
     poster = models.ImageField(upload_to=upload_file_name, null=True, blank=True)
     poster_url = models.URLField(blank=True, null=True)
     trailer = models.URLField()
     rating = models.FloatField()
     cast = models.ManyToManyField(Actor, related_name='casts')
     director = models.ManyToManyField(Producer, related_name='directors')
-    episodes = models.ManyToManyField('Episode', related_name='episodes')
+    episodes = models.ManyToManyField('Episode', related_name='episodes', blank=True)
     slug = models.SlugField(max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -297,7 +297,7 @@ class TVSeries(models.Model):
 #         genres = imdb_data['genres']
 #
 #         # populate other fields based on retrieved data
-#         # instance.genre.set([Category.objects.get_or_create(name=genre)[0] for genre in genres])
+#         # instance.genre.set([Genre.objects.get_or_create(name=genre)[0] for genre in genres])
 #         instance.name = imdb_data.get('title')
 #         # instance.release_date = imdb_data.get('year')
 #         instance.num_seasons = imdb_data['seasons']
@@ -308,19 +308,51 @@ class TVSeries(models.Model):
 
 
 class Episode(models.Model):
+    " 'director', 'episode', 'episode title', 'full-size cover url', 'cast', "
+    " 'original air date', 'producer', 'rating', 'runtimes', 'season', "
+    "'title', 'writer', 'year'"
+    def upload_file_name(self, filename):
+        x = self.title
+        characters_to_remove = '<,>,:,",/,\,|,?,*,.'
+        tvseries = self.tv_series.title
+        for character in characters_to_remove:
+            x = x.replace(character, "")
+        return f'tv-series/{tvseries}/{x}/images/{filename}'
     imdb_id = models.CharField(max_length=50, null=True, blank=True)
-    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True, )
     tv_series = models.ForeignKey(TVSeries, on_delete=models.CASCADE, default=1)
     season = models.PositiveSmallIntegerField()
     episode_number = models.PositiveSmallIntegerField()
     duration = models.DurationField()
     description = models.TextField()
-    episode_view_count = models.PositiveIntegerField(default=0)
+    rating = models.FloatField(blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    original_air_date = models.CharField(max_length=50, null=True, blank=True)
+    cast = models.ManyToManyField(Actor, blank=True)
+    director = models.ManyToManyField(Producer, related_name='director_producer', blank=True)
+    writer = models.ManyToManyField(Producer, related_name='writer_producer', blank=True)
+    producer = models.ManyToManyField(Producer, related_name='producer_producer', blank=True)
+    cover = models.ImageField(upload_to=upload_file_name, null=True, blank=True)
+    cover_url = models.URLField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    episode_view_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.name} (Season {self.season}, Episode {self.episode_number})"
+        return f"{self.title} (Season {self.season}, Episode {self.episode_number})"
+
+    class Meta:
+        ordering = ('-created',)
+        index_together = (('id', 'slug'),)
+
+    def get_absolute_url(self):
+        return reverse('Episode_Watch_View', args=[str(self.slug)])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = create_slug_series(self.title)
 
 
 class DailySeriesViews(models.Model):
@@ -335,6 +367,12 @@ def create_slug_series(title):
     # Limit the slug length to 50 characters
     slug = slug[:50]
     return slug
+
+
+class DailySeriesEpisodeViews(models.Model):
+    episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
+    date = models.DateField()
+    views = models.PositiveIntegerField(default=0)
 
 
 

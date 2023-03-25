@@ -18,14 +18,17 @@
           return;
         }
         $.ajax({
-          url: '/fetch-data/' + imdb_id,
+          url: '/fetch-data-ep/' + imdb_id,
           success: function(data) {
             $('#id_title').val(data.title);
+            $('#id_season').val(data.season);
+            $('#id_episode_number').val(data.episode_number);
+            $('#id_duration').val(data.duration);
             $('#id_description').val(data.description);
-            $('#id_release_year').val(data.release_year);
-            $('#id_num_seasons').val(data.num_seasons);
-            $('#id_poster_url').val(data.poster_url);
             $('#id_rating').val(data.rating);
+            $('#id_year').val(data.year);
+            $('#id_original_air_date').val(data.original_air_date);
+            $('#id_cover_url').val(data.cover_url);
 
           }
         });

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .models import Category, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries, Episode
+from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries, Episode
 
 from PIL import Image
 import requests
@@ -81,18 +81,40 @@ admin.site.register(TVSeries, TVSeriesAdmin)
 
 
 class EpisodeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'season', 'created', 'updated',)
-    list_display_links = ('name',)
+    list_display = ('title', 'tv_series', 'season', 'episode_number', 'created', 'updated',)
+    list_display_links = ('title',)
     list_per_page = 20
-    ordering = ['season']
-    search_fields = ['name', 'description',]
+    ordering = ['tv_series', 'season', 'episode_number']
+    list_filter = ['tv_series', 'created', 'updated']
+    search_fields = ['title', 'description', ]
     exclude = ('created', 'updated',)
+    prepopulated_fields = {'slug': ('title',)}
+
+    def save_model(self, request, obj, form, change):
+        if change:  # if editing an existing object
+            old_obj = Episode.objects.get(pk=obj.pk)
+            if 'cover' in form.changed_data:
+                old_obj.cover.delete(save=False)
+                super().save_model(request, obj, form, change)
+            elif obj.cover_url:
+                if old_obj.cover:
+                    old_obj.cover.delete(save=False)
+                url = obj.cover_url
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content))
+                # image = image.resize((285, 437), Image.ANTIALIAS)
+                filestream = BytesIO()
+                image.save(filestream, 'JPEG')
+                filestream.seek(0)
+                obj.cover.save(obj.cover_url.split('/')[-1], File(filestream), save=False)
+                super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)  # continue with saving the object
 
 
 admin.site.register(Episode, EpisodeAdmin)
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class GenreAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'created_at', 'updated_at',)
     list_display_links = ('title',)
     list_per_page = 20
@@ -102,7 +124,7 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
-admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
 
 
 class MovieAdmin(admin.ModelAdmin):

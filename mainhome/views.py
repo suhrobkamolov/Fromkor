@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from datetime import timedelta, date
 from django.db.models import Sum
-from Movies.models import Movie, Category, DailyMovieViews
+from Movies.models import Movie, Genre, DailyMovieViews
 from .models import Carousel
 
 
@@ -21,7 +21,7 @@ def home(request):
         .order_by('-views')
     most_watched_movies = [Movie.objects.get(id=view['movie']) for view in movie_views]
     carousel_objects = Carousel.objects.all()
-    categoryset = Category.objects.all()
+    categoryset = Genre.objects.all()
     queryset = Movie.objects.filter(created__gte=start_date)
     context = {
         'carousel_list': carousel_objects,
