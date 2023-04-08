@@ -17,3 +17,4 @@ django-ckeditor
 django-allauth == 0.43.0
 pillow
 cinemagoer
+django-countries

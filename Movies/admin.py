@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries, Episode
+from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries, Episode, DailySeriesEpisodeViews
 
 from PIL import Image
 import requests
@@ -108,6 +108,19 @@ class EpisodeAdmin(admin.ModelAdmin):
                 filestream.seek(0)
                 obj.cover.save(obj.cover_url.split('/')[-1], File(filestream), save=False)
                 super().save_model(request, obj, form, change)
+        else:
+            if obj.cover:
+                super().save_model(request, obj, form, change)
+            elif obj.cover_url:
+                url = obj.cover_url
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content))
+                # image = image.resize((285, 437), Image.ANTIALIAS)
+                filestream = BytesIO()
+                image.save(filestream, 'JPEG')
+                filestream.seek(0)
+                obj.cover.save(obj.cover_url.split('/')[-1], File(filestream), save=False)
+                super().save_model(request, obj, form, change)
         super().save_model(request, obj, form, change)  # continue with saving the object
 
 
@@ -128,21 +141,23 @@ admin.site.register(Genre, GenreAdmin)
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ['movie_title', 'slug', 'movie_release_date', 'created', 'updated']
-    list_filter = ['created', 'updated', 'movie_genre']
-    list_editable = ['movie_release_date', ]
+    list_display = ['title', 'slug', 'release_date', "is_active"]
+    list_filter = ['created', 'updated', 'genre']
+    list_editable = ['is_active', ]
     list_per_page = 50
     ordering = ['-created']
-    search_fields = ['movie_title', 'movie_description', 'meta_keywords', 'meta_description']
+    search_fields = ['title', 'plot_summary', ]
     exclude = ('created_at', 'updated_at',)
-    prepopulated_fields = {'slug': ('movie_title',)}
+    prepopulated_fields = {'slug': ('title',)}
 
 
 admin.site.register(Movie, MovieAdmin)
+
 admin.site.register(Company)
 admin.site.register(Producer)
 admin.site.register(Actor)
 admin.site.register(DailyMovieViews)
+admin.site.register(DailySeriesEpisodeViews)
 
 
 

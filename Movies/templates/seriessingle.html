@@ -25,7 +25,7 @@
                         <div class="movie-btn">
                             <div class="btn-transform transform-vertical red">
                                 <div><a href="#" class="item item-1 redbtn"> <i class="ion-play"></i> Watch TV-Series</a></div>
-                                <div><a href="{% url 'home' %}" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
+                                <div><a href="#ion-play" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
                             </div>
 {#                            <div class="btn-transform transform-vertical">#}
 {#                                <div><a href="#" class="item item-1 yellowbtn"> <i class="ion-card"></i> Buy ticket</a></div>#}
@@ -37,7 +37,7 @@
                 <div class="col-md-8 col-sm-12 col-xs-12">
                     <div class="movie-single-ct main-content">
                         <h1 class="bd-hd">{{ series.title }} <span> {{ series.release_year }}</span></h1>
-                        {% comment %}
+                        {% comment 'Social Btn' %}
                         <div class="social-btn">
                             <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
                             <div class="hover-bnt">
@@ -91,7 +91,7 @@
                                                 <p> {{ series.description }} </p>
                                                 <div class="title-hd-sm">
                                                     <h4>Current Season</h4>
-                                                    <a href="#" class="time">View All Seasons <i class="ion-ios-arrow-right"></i></a>
+                                                    <a href="#all-seasons" class="time" id="all-seasons">View All Seasons <i class="ion-ios-arrow-right"></i></a>
                                                 </div>
                                                 {# <!-- Current season -->#}
                                                 <div class="mvcast-item">
@@ -107,39 +107,48 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {% comment "Videos & Photos" %}
+                                                {% comment "Videos Photos" %}
                                                 <div class="title-hd-sm">
                                                     <h4>Videos & Photos</h4>
-                                                    <a href="#" class="time">All 5 Videos & 245 Photos <i class="ion-ios-arrow-right"></i></a>
                                                 </div>
                                                 <div class="mvsingle-item ov-item">
-                                                    <a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image41.jpg" ><img src="images/uploads/image4.jpg" alt=""></a>
-                                                    <a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image51.jpg" ><img src="images/uploads/image5.jpg" alt=""></a>
-                                                    <a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image61.jpg" ><img src="images/uploads/image6.jpg" alt=""></a>
-                                                    <div class="vd-it">
-                                                        <img class="vd-img" src="images/uploads/image7.jpg" alt="">
-                                                        <a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
-                                                    </div>
+                                                    <iframe id="the_frame" src="https://vidsrc.me/embed/tt{{ series.imdb_id }}/1-1/" frameborder="0" scrolling="no" allowfullscreen="yes" style="height: 100%; width: 100%;" onload="remove_loading()"></iframe>
+
                                                 </div>
                                                 {% endcomment %}
                                                 {# Full Cast & Crew #}
+                                                {% comment %}
                                                 <div class="title-hd-sm">
                                                     <h4>cast</h4>
                                                     <a href="#" class="time">Full Cast & Crew  <i class="ion-ios-arrow-right"></i></a>
                                                 </div>
                                                 <div class="mvcast-item">
                                                     {# Cast list #}
-                                                    {% for cast in series.cast.all %}
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast1.jpg" alt="">
-                                                            <a href="#">Robert Downey Jr.</a>
+                                                    {% if series.imdb_id %}
+                                                        {% for i in cast|slice:":8" %}
+                                                        <div class="cast-it">
+                                                            <div class="cast-left">
+                                                                <img src="{{ i.headshot }}" alt="">
+                                                                <a href="#">{{ i }}</a>
+                                                            </div>
+                                                            <p>... {{ i.currentRole }}</p>
                                                         </div>
-                                                        <p>...  Robert Downey Jr.</p>
-                                                    </div>
-                                                    {% endfor %}
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {% for i in cast|slice:":8" %}
+                                                        <div class="cast-it">
+                                                            <div class="cast-left">
+                                                                <img src="{{ i.headshot }}" alt="">
+                                                                <a href="#">{{ i }}</a>
+                                                            </div>
+                                                            <p>... {{ i.currentRole }}</p>
+                                                        </div>
+                                                        {% endfor %}
+                                                    {% endif %}
 
                                                 </div>
+                                                {% endcomment %}
+                                                {% comment "user rewiew" %}
                                                 <div class="title-hd-sm">
                                                     <h4>User reviews</h4>
                                                     <a href="#" class="time">See All 56 Reviews <i class="ion-ios-arrow-right"></i></a>
@@ -174,37 +183,38 @@
                                                         themselves in each film, there are no problems watching it more than
                                                         once.</p>
                                                 </div>
+                                                {% endcomment %}
                                             </div>
                                             <div class="col-md-4 col-xs-12 col-sm-12">
                                                 <div class="sb-it">
                                                     <h6>Director: </h6>
-                                                    <p><a href="#">Mark Cendrowski</a></p>
+                                                    <p> {% for i in series.director.all %} <a href="#">{{ i.producer_name }}, </a> {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Writer: </h6>
-                                                    <p><a href="#"> Chuck Lorre,</a> <a href="#">Bill Prady</a></p>
+                                                    <p>{% for i in series.writers.all %} <a href="#">{{ i.producer_name }}, </a> {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Stars: </h6>
-                                                    <p><a href="#">Robert Downey Jr,</a> <a href="#">Chris Evans,</a>
-                                                        <a href="#">Mark Ruffalo,</a><a href="#"> Scarlett Johansson</a></p>
+                                                    <p>{% for i in cast|slice:":4" %}<a href="#">{{ i }}, </a> {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Genres:</h6>
-                                                    <p><a href="#">Action, </a> <a href="#"> Sci-Fi,</a> <a href="#">Adventure</a></p>
+                                                    <p>{% for i in series.genre.all %}<a href="#">{{ i.title }}, </a> {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Release Date:</h6>
-                                                    <p>1 May 2006 (U.S.A)</p>
+                                                    <p>{{ series.episodes.first.original_air_date }}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Run Time:</h6>
-                                                    <p>22 min</p>
+                                                    <p>{{ series|series_total_run_time}}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>MMPA Rating:</h6>
-                                                    <p>TV-14</p>
+                                                    <p>{{ series.MPAA_rating}}</p>
                                                 </div>
+                                                {% comment 'plot keywords' %}
                                                 <div class="sb-it">
                                                     <h6>Plot Keywords:</h6>
                                                     <p class="tags">
@@ -215,9 +225,33 @@
                                                         <span class="time"><a href="#">final battle</a></span>
                                                     </p>
                                                 </div>
+                                                {% endcomment %}
+                                                {% comment 'ads' %}
                                                 <div class="ads">
                                                     <img src="images/uploads/ads1.png" alt="">
                                                 </div>
+                                                {% endcomment %}
+                                            </div>
+                                        </div>
+                                        <h1 class="bd-hd">{{ series.title }} <span> {{ series.release_year }}</span></h1>
+                                            <div class="seasons-container">
+                                                {% for s in season_list %}
+                                                    <div class="season" data-season="{{ s.season_number }}">
+                                                        <div class="season-num">Season {{ s.season_number }}</div>
+                                                        {% for e in s.season_episodes %}
+                                                                <div class="episodes-container">
+                                                                    <div class="episode" data-src="https://vidsrc.me/embed/tt{{ series.imdb_id }}/{{ s.season_number }}-{{ e.episode_number }}/">Episode {{ e.episode_number }}</div>
+                                                                </div>
+                                                        {% empty %}
+                                                                <h1>Not Premiered</h1>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        <hr style="border: 1px solid black; margin-bottom: 10px;">
+                                        <div class="row">
+                                            <div id="video-player" style="width: 800px; height: 450px;">
+                                                <iframe id="the_frame" src="https://vidsrc.me/embed/tt{{ series.imdb_id }}/1-1/" frameborder="0" scrolling="no" allowfullscreen="yes" style="height: 100%; width: 100%;" onload="remove_loading()"></iframe>
                                             </div>
                                         </div>
                                     </div>
@@ -405,7 +439,7 @@
                                     <div id="cast" class="tab">
                                         <div class="row">
                                             <h3>Cast & Crew of</h3>
-                                            <h2>Avengers: Age of Ultron</h2>
+                                            <h2>{{ series.title }}</h2>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
                                                 <h4>Directors & Credit Writers</h4>
@@ -413,183 +447,62 @@
                                             <div class="mvcast-item">
                                                 <div class="cast-it">
                                                     <div class="cast-left">
-                                                        <h4>JW</h4>
-                                                        <a href="#">Joss Whedon</a>
+                                                        {% for director in series.director.all %}
+                                                            <h4>{{ director.producer_name.split.0.0 }}{{ director.producer_name.split.1.0 }}</h4>
+                                                            <a href="#">{{ director.producer_name }}</a>
+                                                        {% endfor %}
                                                     </div>
-                                                    <p>...  Director</p>
+                                                    <p>...  Directors</p>
                                                 </div>
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
-                                                <h4>Directors & Credit Writers</h4>
+                                                <h4>Credit Writers</h4>
                                             </div>
                                             <div class="mvcast-item">
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>SL</h4>
-                                                        <a href="#">Stan Lee</a>
+                                                {% for writer in series.writers.all %}
+                                                    <div class="cast-it">
+                                                        <div class="cast-left">
+                                                            <h4>{{ writer.producer_name.split.0.0 }}{{ writer.producer_name.split.1.0 }}</h4>
+                                                            <a href="#">{{ writer.producer_name }}</a>
+                                                        </div>
+                                                        <p>...  Writer</p>
                                                     </div>
-                                                    <p>...  (based on Marvel comics)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JK</h4>
-                                                        <a href="#">Jack Kirby</a>
-                                                    </div>
-                                                    <p>...  (based on Marvel comics)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JS</h4>
-                                                        <a href="#">Joe Simon</a>
-                                                    </div>
-                                                    <p>...  (character created by: Captain America)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JS</h4>
-                                                        <a href="#">Joe Simon</a>
-                                                    </div>
-                                                    <p>...  (character created by: Thanos)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>RT</h4>
-                                                        <a href="#">Roy Thomas</a>
-                                                    </div>
-                                                    <p>...  (character created by: Ultron, Vision)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JB</h4>
-                                                        <a href="#">John Buscema</a>
-                                                    </div>
-                                                    <p>...  (character created by: Ultron, Vision)</p>
-                                                </div>
+                                                {% endfor %}
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
                                                 <h4>Cast</h4>
                                             </div>
                                             <div class="mvcast-item">
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast1.jpg" alt="">
-                                                        <a href="#">Robert Downey Jr.</a>
-                                                    </div>
-                                                    <p>...  Robert Downey Jr.</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast2.jpg" alt="">
-                                                        <a href="#">Chris Hemsworth</a>
-                                                    </div>
-                                                    <p>...  Thor</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast3.jpg" alt="">
-                                                        <a href="#">Mark Ruffalo</a>
-                                                    </div>
-                                                    <p>...  Bruce Banner/ Hulk</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast4.jpg" alt="">
-                                                        <a href="#">Chris Evans</a>
-                                                    </div>
-                                                    <p>...  Steve Rogers/ Captain America</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast5.jpg" alt="">
-                                                        <a href="#">Scarlett Johansson</a>
-                                                    </div>
-                                                    <p>...  Natasha Romanoff/ Black Widow</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast6.jpg" alt="">
-                                                        <a href="#">Jeremy Renner</a>
-                                                    </div>
-                                                    <p>...  Clint Barton/ Hawkeye</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast7.jpg" alt="">
-                                                        <a href="#">James Spader</a>
-                                                    </div>
-                                                    <p>...  Ultron</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast9.jpg" alt="">
-                                                        <a href="#">Don Cheadle</a>
-                                                    </div>
-                                                    <p>...  James Rhodes/ War Machine</p>
-                                                </div>
+                                                {% if series.imdb_id %}
+                                                    {% for c in cast %}
+                                                        <div class="cast-it">
+                                                            <div class="cast-left">
+                                                                <img src="{{ c.image_url }}" alt="">
+                                                                <a href="#">{{ c.name }}</a>
+                                                            </div>
+                                                            <p>... {{ c.currentRole}}</p>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
                                                 <h4>Produced by</h4>
                                             </div>
                                             <div class="mvcast-item">
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>VA</h4>
-                                                        <a href="#">Victoria Alonso</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>MB</h4>
-                                                        <a href="#">Mitchel Bell</a>
-                                                    </div>
-                                                    <p>...  co-producer (as Mitch Bell)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JC</h4>
-                                                        <a href="#">Jamie Christopher</a>
-                                                    </div>
-                                                    <p>...  associate producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>LD</h4>
-                                                        <a href="#">Louis D’Esposito</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JF</h4>
-                                                        <a href="#">Jon Favreau</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>KF</h4>
-                                                        <a href="#">Kevin Feige</a>
-                                                    </div>
-                                                    <p>...  producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>AF</h4>
-                                                        <a href="#">Alan Fine</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JF</h4>
-                                                        <a href="#">Jeffrey Ford</a>
-                                                    </div>
-                                                    <p>...  associate producer</p>
-                                                </div>
+                                                {% if series.producer.first %}
+                                                    {% for p in series.producer.all %}
+                                                        <div class="cast-it">
+                                                            <div class="cast-left">
+                                                                <h4>{{ p.producer_name.split.0.0 }}{{ p.producer_name.split.1.0 }}</h4>
+                                                                <a href="#">{{ p.producer_name }}</a>
+                                                            </div>
+                                                            <p>... {{ p.role }}</p>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -722,84 +635,26 @@
                                     {# Start Season #}
                                     <div id="season" class="tab">
                                         <div class="row">
-                                            <div class="mvcast-item">
-                                                <div class="cast-it">
-                                                    <div class="cast-left series-it">
-                                                        <img src="images/uploads/season.jpg" alt="">
-                                                        <div>
-                                                            <a href="#">Season 10</a>
-                                                            <p>21 Episodes</p>
-                                                            <p>Season 10 of The Big Bang Theory premiered on
-                                                            September 19, 2016.</p>
+                                            {% for s in season_list %}
+                                                <div class="mvcast-item">
+                                                    <div class="cast-it">
+                                                        <div class="cast-left series-it">
+                                                            <img src="{{ s.cover_url }}" alt="" width="100" height="153">
+                                                                <a href="#">Season {{ s.season_number }}</a>
+                                                                <p>{{ s.total_episode }} Episodes</p>
+                                                                {% if s.air_date == "Soon!" %}
+                                                                    <p>Season {{ s.season_number }} of {{ series.title }} will be premiered
+                                                                    {{ s.air_date }}.</p>
+                                                                {% else %}
+                                                                    <p>Season {{ s.season_number }} of {{ series.title }} premiered on
+                                                                    {{ s.air_date }}.</p>
+                                                                {% endif %}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="mvcast-item">
-                                                    <div class="cast-it">
-                                                        <div class="cast-left series-it">
-                                                            <img src="images/uploads/season.jpg" alt="">
-                                                            <div>
-                                                                <a href="#">Season 10</a>
-                                                                <p>21 Episodes</p>
-                                                                <p>Season 10 of The Big Bang Theory premiered on
-                                                                September 19, 2016.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mvcast-item">
-                                                    <div class="cast-it">
-                                                        <div class="cast-left series-it">
-                                                            <img src="images/uploads/season.jpg" alt="">
-                                                            <div>
-                                                                <a href="#">Season 10</a>
-                                                                <p>21 Episodes</p>
-                                                                <p>Season 10 of The Big Bang Theory premiered on
-                                                                September 19, 2016.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mvcast-item">
-                                                    <div class="cast-it">
-                                                        <div class="cast-left series-it">
-                                                            <img src="images/uploads/season.jpg" alt="">
-                                                            <div>
-                                                                <a href="#">Season 10</a>
-                                                                <p>21 Episodes</p>
-                                                                <p>Season 10 of The Big Bang Theory premiered on
-                                                                September 19, 2016.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mvcast-item">
-                                                    <div class="cast-it">
-                                                        <div class="cast-left series-it">
-                                                            <img src="images/uploads/season.jpg" alt="">
-                                                            <div>
-                                                                <a href="#">Season 10</a>
-                                                                <p>21 Episodes</p>
-                                                                <p>Season 10 of The Big Bang Theory premiered on
-                                                                September 19, 2016.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mvcast-item">
-                                                    <div class="cast-it">
-                                                        <div class="cast-left series-it">
-                                                            <img src="images/uploads/season.jpg" alt="">
-                                                            <div>
-                                                                <a href="#">Season 10</a>
-                                                                <p>21 Episodes</p>
-                                                                <p>Season 10 of The Big Bang Theory premiered on
-                                                                September 19, 2016.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            {% empty %}
+                                            {% endfor %}
                                         </div>
                                     </div>
                                     {# End Season #}
@@ -896,7 +751,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>

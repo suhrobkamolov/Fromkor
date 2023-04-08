@@ -25,7 +25,7 @@ class TVSeriesAdminForm(forms.ModelForm):
     class Meta:
         model = TVSeries
         fields = ['imdb_id', 'title', 'slug', 'release_date', 'release_year', 'num_seasons', 'description', 'genre',
-                  'trailer', 'rating', 'cast', 'director', 'episodes', 'MPAA_rating', 'view_count', 'is_active',
+                  'trailer', 'rating', 'cast', 'director', 'writers', 'producer', 'episodes', 'MPAA_rating', 'view_count', 'is_active',
                   'fetch_data', 'is_continuing', 'poster', 'poster_url']
 
     def clean(self):

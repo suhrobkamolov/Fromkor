@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     # Local apps
     'mainhome',
     'Movies',
+    # For models
+    'django_countries',
     # allauth apps
     # Required allauth apps:
     'django.contrib.sites',

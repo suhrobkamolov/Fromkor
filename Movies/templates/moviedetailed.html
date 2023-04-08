@@ -1,7 +1,7 @@
 {% extends 'head.html' %}
 {% block head_title %}SUHA{% endblock %}
+{% load static %}
 {% block content %}
-
     <div class="hero mv-single-hero">
         <div class="container">
             <div class="row">
@@ -20,22 +20,19 @@
             <div class="row ipad-width2">
                 <div class="col-md-4 col-sm-12 col-xs-12">
                     <div class="movie-img sticky-sb">
-                        <img src="{{ movie.movie_image.url }}" alt="{{ movie.movie_title }}">
+                        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
                         <div class="movie-btn">
                             <div class="btn-transform transform-vertical red">
-                                <div><a href="#" class="item item-1 redbtn"> <i class="ion-play"></i> Watch Trailer</a></div>
-                                <div><a href="{{ movie.movie_trailer_url }}" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
-                            </div>
-                            <div class="btn-transform transform-vertical">
-                                <div><a href="#" class="item item-1 yellowbtn"> <i class="ion-card"></i> Buy ticket</a></div>
-                                <div><a href="#" class="item item-2 yellowbtn"><i class="ion-card"></i></a></div>
+                                <div><a href="#" class="item item-1 redbtn"> <i class="ion-play"></i> Watch Movie</a></div>
+                                <div><a href="#" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-8 col-sm-12 col-xs-12">
                     <div class="movie-single-ct main-content">
-                        <h1 class="bd-hd">Skyfall: Quantum of Spectre <span>2015</span></h1>
+                        <h1 class="bd-hd">{{ movie.title }} <span> {{ movie.year }}</span></h1>
+                        {% comment "socialbutton" %}
                         <div class="social-btn">
                             <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
                             <div class="hover-bnt">
@@ -48,13 +45,15 @@
                                 </div>
                             </div>
                         </div>
+                        {% endcomment %}
                         <div class="movie-rate">
                             <div class="rate">
                                 <i class="ion-android-star"></i>
-                                <p><span>8.1</span> /10<br>
-                                    <span class="rv">56 Reviews</span>
+                                <p><span>{{ movie.movie_imdb}}</span> /10 IMDb<br>
+                                <span class="rv">{{ movie.votes }} Reviews</span>
                                 </p>
                             </div>
+                            {% comment "rate-star" %}
                             <div class="rate-star">
                                 <p>Rate This Movie:  </p>
                                 <i class="ion-ios-star"></i>
@@ -67,21 +66,23 @@
                                 <i class="ion-ios-star"></i>
                                 <i class="ion-ios-star-outline"></i>
                             </div>
+                            {% endcomment %}
                         </div>
                         <div class="movie-tabs">
                             <div class="tabs">
                                 <ul class="tab-links tabs-mv">
                                     <li class="active"><a href="#overview">Overview</a></li>
-                                    <li><a href="#reviews"> Reviews</a></li>
+                                    {#<li><a href="#reviews"> Reviews</a></li>#}
                                     <li><a href="#cast">  Cast & Crew </a></li>
-                                    <li><a href="#media"> Media</a></li>
-                                    <li><a href="#moviesrelated"> Related Movies</a></li>
+                                    {#<li><a href="#media"> Media</a></li>#}
+                                    {#<li><a href="#moviesrelated"> Related Movies</a></li>#}
                                 </ul>
                                 <div class="tab-content">
                                     <div id="overview" class="tab active">
                                         <div class="row">
                                             <div class="col-md-8 col-sm-12 col-xs-12">
-                                                <p>Tony Stark creates the Ultron Program to protect the world, but when the peacekeeping program becomes hostile, The Avengers go into action to try and defeat a virtually impossible enemy together. Earth's mightiest heroes must come together once again to protect the world from global extinction.</p>
+                                                <p>{{ movie.plot_summary }}</p>
+                                                {% comment "Videos & Photos" %}
                                                 <div class="title-hd-sm">
                                                     <h4>Videos & Photos</h4>
                                                     <a href="#" class="time">All 5 Videos & 245 Photos <i class="ion-ios-arrow-right"></i></a>
@@ -91,10 +92,12 @@
                                                     <a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image21.jpg" ><img src="images/uploads/image2.jpg" alt=""></a>
                                                     <a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image31.jpg" ><img src="images/uploads/image3.jpg" alt=""></a>
                                                     <div class="vd-it">
-                                                        <img class="vd-img" src="images/uploads/image4.jpg" alt="">
-                                                        <a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+                                                        <img class="vd-img" src="{{ movie.poster.url }}" alt="">
+                                                        <a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="{% static "images/play-vd.png" %}" alt=""></a>
                                                     </div>
                                                 </div>
+                                                {% endcomment %}
+                                                {% comment "Cast" %}
                                                 <div class="title-hd-sm">
                                                     <h4>cast</h4>
                                                     <a href="#" class="time">Full Cast & Crew  <i class="ion-ios-arrow-right"></i></a>
@@ -108,56 +111,9 @@
                                                         </div>
                                                         <p>...  Robert Downey Jr.</p>
                                                     </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast2.jpg" alt="">
-                                                            <a href="#">Chris Hemsworth</a>
-                                                        </div>
-                                                        <p>...  Thor</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast3.jpg" alt="">
-                                                            <a href="#">Mark Ruffalo</a>
-                                                        </div>
-                                                        <p>...  Bruce Banner/ Hulk</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast4.jpg" alt="">
-                                                            <a href="#">Chris Evans</a>
-                                                        </div>
-                                                        <p>...  Steve Rogers/ Captain America</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast5.jpg" alt="">
-                                                            <a href="#">Scarlett Johansson</a>
-                                                        </div>
-                                                        <p>...  Natasha Romanoff/ Black Widow</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast6.jpg" alt="">
-                                                            <a href="#">Jeremy Renner</a>
-                                                        </div>
-                                                        <p>...  Clint Barton/ Hawkeye</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast7.jpg" alt="">
-                                                            <a href="#">James Spader</a>
-                                                        </div>
-                                                        <p>...  Ultron</p>
-                                                    </div>
-                                                    <div class="cast-it">
-                                                        <div class="cast-left">
-                                                            <img src="images/uploads/cast9.jpg" alt="">
-                                                            <a href="#">Don Cheadle</a>
-                                                        </div>
-                                                        <p>...  James Rhodes/ War Machine</p>
-                                                    </div>
                                                 </div>
+                                                {% endcomment %}
+                                                {% comment 'Review' %}
                                                 <div class="title-hd-sm">
                                                     <h4>User reviews</h4>
                                                     <a href="#" class="time">See All 56 Reviews <i class="ion-ios-arrow-right"></i></a>
@@ -182,52 +138,57 @@
                                                     </p>
                                                     <p>This is by far one of my favorite movies from the MCU. The introduction of new Characters both good and bad also makes the movie more exciting. giving the characters more of a back story can also help audiences relate more to different characters better, and it connects a bond between the audience and actors or characters. Having seen the movie three times does not bother me here as it is as thrilling and exciting every time I am watching it. In other words, the movie is by far better than previous movies (and I do love everything Marvel), the plotting is splendid (they really do out do themselves in each film, there are no problems watching it more than once.</p>
                                                 </div>
+                                                {% endcomment %}
                                             </div>
                                             <div class="col-md-4 col-xs-12 col-sm-12">
                                                 <div class="sb-it">
                                                     <h6>Director: </h6>
-                                                    <p><a href="#">Joss Whedon</a></p>
+                                                    <p>{% for i in movie.director.all %}
+                                                        <a href="#">{{ i.producer_name }}</a>
+                                                        {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Writer: </h6>
-                                                    <p><a href="#">Joss Whedon,</a> <a href="#">Stan Lee</a></p>
+                                                    <p>{% for i in movie.writer.all %}
+                                                        <a href="#">{{ i.producer_name }}</a>
+                                                        {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Stars: </h6>
-                                                    <p><a href="#">Robert Downey Jr,</a> <a href="#">Chris Evans,</a> <a href="#">Mark Ruffalo,</a><a href="#"> Scarlett Johansson</a></p>
+                                                    <p>{% for i in cast|slice:":4" %}<a href="#">{{ i }}, </a> {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Genres:</h6>
-                                                    <p><a href="#">Action, </a> <a href="#"> Sci-Fi,</a> <a href="#">Adventure</a></p>
+                                                    <p>{% for i in movie.genre.all %}<a href="#">{{ i.title }}, </a>
+                                                    {% endfor %}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Release Date:</h6>
-                                                    <p>May 1, 2015 (U.S.A)</p>
+                                                    <p>{{ movie.release_date }}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Run Time:</h6>
-                                                    <p>141 min</p>
+                                                    <p>{{ movie.run_time }}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>MMPA Rating:</h6>
-                                                    <p>PG-13</p>
+                                                    <p>{{ movie.MPAA_rating }}</p>
                                                 </div>
                                                 <div class="sb-it">
                                                     <h6>Plot Keywords:</h6>
                                                     <p class="tags">
-                                                        <span class="time"><a href="#">superhero</a></span>
-                                                        <span class="time"><a href="#">marvel universe</a></span>
-                                                        <span class="time"><a href="#">comic</a></span>
-                                                        <span class="time"><a href="#">blockbuster</a></span>
-                                                        <span class="time"><a href="#">final battle</a></span>
+                                                        <span class="time"><a href="#">{{ movie.plot_keywords }}</a></span>
                                                     </p>
                                                 </div>
+                                                {% comment 'add' %}
                                                 <div class="ads">
                                                     <img src="images/uploads/ads1.png" alt="">
                                                 </div>
+                                                {% endcomment %}
                                             </div>
                                         </div>
                                     </div>
+                                    {% comment "Reviews" %}
                                     <div id="reviews" class="tab review">
                                        <div class="row">
                                             <div class="rv-hd">
@@ -407,197 +368,74 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% endcomment %}
                                     <div id="cast" class="tab">
                                         <div class="row">
                                             <h3>Cast & Crew of</h3>
-                                            <h2>Avengers: Age of Ultron</h2>
+                                            <h2>{{ movie.title }}</h2>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
-                                                <h4>Directors & Credit Writers</h4>
+                                                <h4>Directors</h4>
                                             </div>
                                             <div class="mvcast-item">
                                                 <div class="cast-it">
                                                     <div class="cast-left">
-                                                        <h4>JW</h4>
-                                                        <a href="#">Joss Whedon</a>
+                                                        {% for director in movie.director.all %}
+                                                            <h4>{{ director.producer_name.split.0.0 }}{{ director.producer_name.split.1.0 }}</h4>
+                                                            <a href="#">{{ director.producer_name }}</a>
+                                                        {% endfor %}
                                                     </div>
                                                     <p>...  Director</p>
                                                 </div>
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
-                                                <h4>Directors & Credit Writers</h4>
+                                                <h4>Credit Writers</h4>
                                             </div>
                                             <div class="mvcast-item">
+                                                {% for writer in movie.director.all %}
                                                 <div class="cast-it">
                                                     <div class="cast-left">
-                                                        <h4>SL</h4>
-                                                        <a href="#">Stan Lee</a>
+                                                        <h4>{{ writer.producer_name.split.0.0 }}{{ writer.producer_name.split.1.0 }}</h4>
+                                                        <a href="#">{{ writer.producer_name }}</a>
                                                     </div>
-                                                    <p>...  (based on Marvel comics)</p>
+                                                    <p>...  Writer</p>
                                                 </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JK</h4>
-                                                        <a href="#">Jack Kirby</a>
-                                                    </div>
-                                                    <p>...  (based on Marvel comics)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JS</h4>
-                                                        <a href="#">Joe Simon</a>
-                                                    </div>
-                                                    <p>...  (character created by: Captain America)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JS</h4>
-                                                        <a href="#">Joe Simon</a>
-                                                    </div>
-                                                    <p>...  (character created by: Thanos)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>RT</h4>
-                                                        <a href="#">Roy Thomas</a>
-                                                    </div>
-                                                    <p>...  (character created by: Ultron, Vision)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JB</h4>
-                                                        <a href="#">John Buscema</a>
-                                                    </div>
-                                                    <p>...  (character created by: Ultron, Vision)</p>
-                                                </div>
+                                                {% endfor %}
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
                                                 <h4>Cast</h4>
                                             </div>
                                             <div class="mvcast-item">
+                                                {% for c in cast %}
                                                 <div class="cast-it">
                                                     <div class="cast-left">
-                                                        <img src="images/uploads/cast1.jpg" alt="">
-                                                        <a href="#">Robert Downey Jr.</a>
+                                                        <img src="{{ c.actor_portrait }}" alt="">
+                                                        <a href="#">{{ c.actor_name }}{{ c.name }}</a>
                                                     </div>
-                                                    <p>...  Robert Downey Jr.</p>
+                                                    <p>...  {{ c.currentRole }}</p>
                                                 </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast2.jpg" alt="">
-                                                        <a href="#">Chris Hemsworth</a>
-                                                    </div>
-                                                    <p>...  Thor</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast3.jpg" alt="">
-                                                        <a href="#">Mark Ruffalo</a>
-                                                    </div>
-                                                    <p>...  Bruce Banner/ Hulk</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast4.jpg" alt="">
-                                                        <a href="#">Chris Evans</a>
-                                                    </div>
-                                                    <p>...  Steve Rogers/ Captain America</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast5.jpg" alt="">
-                                                        <a href="#">Scarlett Johansson</a>
-                                                    </div>
-                                                    <p>...  Natasha Romanoff/ Black Widow</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast6.jpg" alt="">
-                                                        <a href="#">Jeremy Renner</a>
-                                                    </div>
-                                                    <p>...  Clint Barton/ Hawkeye</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast7.jpg" alt="">
-                                                        <a href="#">James Spader</a>
-                                                    </div>
-                                                    <p>...  Ultron</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="images/uploads/cast9.jpg" alt="">
-                                                        <a href="#">Don Cheadle</a>
-                                                    </div>
-                                                    <p>...  James Rhodes/ War Machine</p>
-                                                </div>
+                                                {% endfor %}
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">
                                                 <h4>Produced by</h4>
                                             </div>
                                             <div class="mvcast-item">
+                                                {% for p in movie.producer.all %}
                                                 <div class="cast-it">
                                                     <div class="cast-left">
-                                                        <h4>VA</h4>
-                                                        <a href="#">Victoria Alonso</a>
+                                                        <h4>{{ p.producer_name.split.0.0 }}{{ p.producer_name.split.1.0 }}</h4>
+                                                        <a href="#">{{ p.producer_name }}</a>
                                                     </div>
-                                                    <p>...  executive producer</p>
+                                                    <p>... Producer</p>
                                                 </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>MB</h4>
-                                                        <a href="#">Mitchel Bell</a>
-                                                    </div>
-                                                    <p>...  co-producer (as Mitch Bell)</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JC</h4>
-                                                        <a href="#">Jamie Christopher</a>
-                                                    </div>
-                                                    <p>...  associate producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>LD</h4>
-                                                        <a href="#">Louis D’Esposito</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JF</h4>
-                                                        <a href="#">Jon Favreau</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>KF</h4>
-                                                        <a href="#">Kevin Feige</a>
-                                                    </div>
-                                                    <p>...  producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>AF</h4>
-                                                        <a href="#">Alan Fine</a>
-                                                    </div>
-                                                    <p>...  executive producer</p>
-                                                </div>
-                                                <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <h4>JF</h4>
-                                                        <a href="#">Jeffrey Ford</a>
-                                                    </div>
-                                                    <p>...  associate producer</p>
-                                                </div>
+                                                {% endfor%}
                                             </div>
                                         </div>
                                     </div>
+                                    {% comment "media" %}
                                     <div id="media" class="tab">
                                         <div class="row">
                                             <div class="rv-hd">
@@ -719,6 +557,8 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% endcomment %}
+                                    {% comment "moviesrelated" %}
                                     <div id="moviesrelated" class="tab">
                                         <div class="row">
                                             <h3>Related Movies To</h3>
@@ -805,6 +645,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {% endcomment %}
                                 </div>
                             </div>
                         </div>
@@ -813,9 +654,6 @@
             </div>
         </div>
     </div>
-    <!-- footer section-->
-
-    <!-- end of footer section-->
 {% endblock %}
 
 

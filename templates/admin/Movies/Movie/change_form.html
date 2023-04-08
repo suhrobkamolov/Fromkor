@@ -1,0 +1,50 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+
+    <script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+      $('.button').click(function() {
+        var imdb_id = $('#id_imdb_id').val();
+        if (imdb_id === '') {
+          alert('IMDb ID is not set.');
+          return;
+        }
+        $.ajax({
+          url: '/fetch-data/' + imdb_id,
+          success: function(data) {
+            $('#id_title').val(data.title);
+            $('#id_release_date').val(data.release_date);
+            $('#id_year').val(data.year);
+            $('#id_run_time').val(data.run_time);
+            $('#id_plot_summary').val(data.description);
+            $('#id_movie_imdb').val(data.rating);
+            $('#id_votes').val(data.votes);
+            $('#id_poster_url').val(data.poster_url);
+
+          }
+        });
+      });
+    });
+  </script>
+
+
+{% endblock %}
+
+{% block after_related_objects %}
+  {{ block.super }}
+  <fieldset class="module aligned wide" id="fetch-data">
+    <h2>Fetch data from IMDb</h2>
+    {{ form.fetch_data }}
+    <button type="button" class="button">Fetch</button>
+  </fieldset>
+{% endblock %}
+
+

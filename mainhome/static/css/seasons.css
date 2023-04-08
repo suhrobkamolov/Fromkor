@@ -1,0 +1,47 @@
+.seasons-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.season {
+    /*margin: 10px;*/
+    padding: 10px;
+    border: 3px solid #23db9b;
+    border-radius: 1px;
+    cursor: pointer;
+}
+
+.season-num {
+    text-align: center;
+    font-size: 24px;
+    color: #23db9b;
+    cursor: pointer;
+}
+
+.episodes-container {
+    display: flex;
+    flex-direction: row;
+    /*padding: 10px;*/
+    /*margin-top: 10px;*/
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 5px;*/
+
+}
+
+.episode {
+    text-align: center;
+    font-size: 18px;
+    color: #fce7d2;
+    /*margin-right: 10px;*/
+    /*padding: 5px;*/
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 5px;*/
+    cursor: pointer;
+}
+
+#video-player {
+    display: block;
+    margin-top: 20px;
+    width: 100%;
+}
+
