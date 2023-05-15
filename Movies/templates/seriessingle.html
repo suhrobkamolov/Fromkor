@@ -234,6 +234,7 @@
                                             </div>
                                         </div>
                                         <h1 class="bd-hd">{{ series.title }} <span> {{ series.release_year }}</span></h1>
+                                            {% comment %}
                                             <div class="seasons-container">
                                                 {% for s in season_list %}
                                                     <div class="season" data-season="{{ s.season_number }}">
@@ -248,12 +249,105 @@
                                                     </div>
                                                 {% endfor %}
                                             </div>
+                                            {% endcomment %}
                                         <hr style="border: 1px solid black; margin-bottom: 10px;">
+
+                                        <div class="row">
+                                            <div class="seasons-list">
+                                                {% for season in season_list %}
+                                                    <div class="season-tab" data-tab="s-tab{{ season.season_number }}">
+                                                        <span class="title">Season {{ season.season_number }}</span>
+                                                        <i class="fa fa-chevron-circle-down"></i>
+                                                    </div>
+                                                    <div class="season-tab-content" data-tab="s-tab{{ season.season_number }}">
+                                                        <table id="ep-list">
+                                                            <tr>
+                                                                <th>Episode Number</th>
+                                                                <th>Episode Title</th>
+                                                                <th>Original Air Date</th>
+                                                            </tr>
+                                                            {% for e in season.season_episodes %}
+                                                                <tr>
+                                                                    <td><a data-source="https://vidsrc.me/embed/tt{{ series.imdb_id }}/{{ season.season_number }}-{{ e.episode_number }}/">Episode {{ e.episode_number }}</a></td>
+                                                                    <td><a data-source="https://vidsrc.me/embed/tt{{ series.imdb_id }}/{{ season.season_number }}-{{ e.episode_number }}/">{{ e.title }}</a></td>
+                                                                    <td><a data-source="https://vidsrc.me/embed/tt{{ series.imdb_id }}/{{ season.season_number }}-{{ e.episode_number }}/">{{ e.original_air_date }}</a></td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </table>
+
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <script>
+                                                    // Get all the episode links
+                                                    var episodeLinks = document.querySelectorAll('#ep-list a');
+
+                                                    // Add click event listener to each episode link
+                                                    episodeLinks.forEach(function(episodeLink) {
+                                                        episodeLink.addEventListener('click', function(event) {
+                                                            // Prevent the default link behavior
+                                                            event.preventDefault();
+
+                                                            // Get the data source from the clicked link
+                                                            var dataSource = episodeLink.getAttribute('data-source');
+
+                                                            // Set the src attribute of the iframe to the data source
+                                                            document.getElementById('iframe').setAttribute('src', dataSource);
+                                                        });
+                                                    });
+                                                document.addEventListener("DOMContentLoaded", function(event) {
+                                                    var tabs = document.querySelectorAll('.season-tab');
+                                                    for (var i = 0; i < tabs.length; i++) {
+                                                        tabs[i].addEventListener('click', function() {
+                                                            var tabContent = document.querySelector('.season-tab-content[data-tab="' + this.getAttribute('data-tab') + '"]');
+                                                            if (tabContent.classList.contains('active')) {
+                                                                tabContent.classList.remove('active');
+                                                            } else {
+                                                                var tabContents = document.querySelectorAll('.season-tab-content');
+                                                                for (var j = 0; j < tabContents.length; j++) {
+                                                                    tabContents[j].classList.remove('active');
+                                                                }
+                                                                tabContent.classList.add('active');
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            </script>
+
+                                            {#    Links   #}
+                                            <div id="links">
+                                              {% for url in movie_urls %}
+                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}')">{{ forloop.counter }} {{ url.channel }}</a>
+                                              {% endfor %}
+                                            </div>
+                                            <div id="iframe-container">
+                                                <iframe id="iframe" src="https://vidsrc.me/embed/tt{{ series.imdb_id }}/1-1/" allowfullscreen="yes" style="height: 100%; width: 100%;"
+                                                        onload="remove_loading()">
+                                                </iframe>
+                                            </div>
+                                            <script>
+                                                function changeLink(link) {
+                                                    var iframe = document.getElementById('iframe');
+                                                    iframe.src = link;
+
+                                                    var links = document.getElementById('links').getElementsByTagName('a');
+                                                    for (var i = 0; i < links.length; i++) {
+                                                        links[i].classList.remove('active');
+                                                    }
+
+                                                    event.currentTarget.classList.add('active');
+                                                }
+                                            </script>
+
+                                        </div>
+                                        {% comment %}
                                         <div class="row">
                                             <div id="video-player" style="width: 800px; height: 450px;">
                                                 <iframe id="the_frame" src="https://vidsrc.me/embed/tt{{ series.imdb_id }}/1-1/" frameborder="0" scrolling="no" allowfullscreen="yes" style="height: 100%; width: 100%;" onload="remove_loading()"></iframe>
                                             </div>
                                         </div>
+                                        {% endcomment %}
                                     </div>
                                     {# End Overview #}
                                     {# Start Reviews #}

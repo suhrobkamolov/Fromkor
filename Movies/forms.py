@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from .models import TVSeries
+from .models import TVSeries, Movie
 
 from django.forms.widgets import ClearableFileInput
 from django.utils.html import mark_safe
@@ -40,4 +40,18 @@ class TVSeriesAdminForm(forms.ModelForm):
             })
 
         return cleaned_data
+
+
+class MovieFilterForm(forms.ModelForm):
+    title = forms.CharField(required=False)
+    rating = forms.FloatField(min_value=0, max_value=10, required=False)
+    genre = forms.CharField(required=False)
+    release_year = forms.IntegerField(required=False)
+
+    class Meta:
+        model = Movie
+        fields = []
+
+
+
 

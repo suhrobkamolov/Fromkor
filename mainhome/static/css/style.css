@@ -4842,7 +4842,7 @@ ul {
   padding-left: 15px;
 }
 .tabs .tab-content .active {
-  margin-left: -15px;
+  margin-left: 0;
 }
 .trailers {
   background-color: #06121e;

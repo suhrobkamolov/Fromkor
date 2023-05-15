@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries, Episode, DailySeriesEpisodeViews
+from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries,\
+    Episode, DailySeriesEpisodeViews, WatchMovieUrl
 
 from PIL import Image
 import requests
@@ -150,6 +151,44 @@ class MovieAdmin(admin.ModelAdmin):
     exclude = ('created_at', 'updated_at',)
     prepopulated_fields = {'slug': ('title',)}
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if change:  # if editing an existing object
+            old_obj = Movie.objects.get(pk=obj.pk)
+            if obj.poster:
+                old_obj.poster.delete(save=False)
+                image = Image.open(obj.poster.path)
+                image = image.resize((285, 437), Image.ANTIALIAS)
+                image.save(obj.poster.path)
+                super().save_model(request, obj, form, change)
+            elif obj.poster_url:
+                old_obj.poster.delete(save=False)
+                url = obj.poster_url
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content))
+                image = image.resize((285, 437), Image.ANTIALIAS)
+                filestream = BytesIO()
+                image.save(filestream, 'JPEG')
+                filestream.seek(0)
+                obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
+                super().save_model(request, obj, form, change)
+        else:
+            if obj.poster:
+                image = Image.open(obj.poster.path)
+                image = image.resize((285, 437), Image.ANTIALIAS)
+                image.save(obj.poster.path)
+                super().save_model(request, obj, form, change)
+            elif obj.poster_url:
+                url = obj.poster_url
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content))
+                image = image.resize((285, 437), Image.ANTIALIAS)
+                filestream = BytesIO()
+                image.save(filestream, 'JPEG')
+                filestream.seek(0)
+                obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
+                super().save_model(request, obj, form, change)
+
 
 admin.site.register(Movie, MovieAdmin)
 
@@ -158,10 +197,10 @@ admin.site.register(Producer)
 admin.site.register(Actor)
 admin.site.register(DailyMovieViews)
 admin.site.register(DailySeriesEpisodeViews)
+admin.site.register(WatchMovieUrl)
 
-
-
-
+# <iframe src="https://vk.com/video_ext.php?oid=202234924&id=456239899&hash=5d3f6b8743fe71f3" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+# <iframe src="https://vk.com/video_ext.php?oid=-67429811&id=456242476&hash=f6debdff836c10c8" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
 
 
 

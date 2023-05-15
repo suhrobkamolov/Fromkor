@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'Movies',
     # For models
     'django_countries',
+    'widget_tweaks',
     # allauth apps
     # Required allauth apps:
     'django.contrib.sites',

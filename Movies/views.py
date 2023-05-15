@@ -1,10 +1,17 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Movie, DailyMovieViews, TVSeries, DailySeriesViews, Episode, DailySeriesEpisodeViews
+from django.views.generic import ListView
+from django.db.models import Q
+from .models import Movie, Genre, DailyMovieViews, TVSeries, DailySeriesViews, Episode, DailySeriesEpisodeViews, WatchMovieUrl
 from django.utils import timezone
 from django.http import JsonResponse
 from imdb import IMDb
+from django.core.paginator import Paginator
+import nltk
+from nltk.corpus import stopwords
+from django.urls import reverse_lazy
 
-# Create your views here.
+nltk.download('stopwords')
+STOPWORDS = set(stopwords.words('english'))
 
 
 def watch_movie(request, slug):
@@ -20,7 +27,8 @@ def watch_movie(request, slug):
         ia = IMDb()
         movie_from_imdb = ia.get_movie(movie.imdb_id)
         cast = movie_from_imdb.get("cast")
-    return render(request, 'moviedetailed.html', {'movie': movie, 'cast': cast}, )
+    movie_urls = WatchMovieUrl.objects.filter(movie=movie)
+    return render(request, 'moviedetailed.html', {'movie': movie, 'cast': cast, "movie_urls": movie_urls}, )
 
 
 def watch_series(request, series_slug):
@@ -35,43 +43,11 @@ def watch_series(request, series_slug):
                                 "air_date": episodes.filter(season=s+1).get(episode_number=1).original_air_date,
                                 "cover_url": episodes.filter(season=s+1).get(episode_number=1).cover.url,
                                 "season_episodes": season_episodes})
-        # else:
-        #     season_list.append({'season_number': s + 1, "total_episode": "Not available",
-        #                         "air_date": "Soon!",
-        #                         "cover_url": series.poster.url,
-        #                         "season_episodes": "Blank!"})
 
     if series.imdb_id and len(cast) < 15:
         ia = IMDb()
         movie = ia.get_movie(series.imdb_id)
         cast = movie.get("cast")
-
-        """ # Fetching images too
-        def get_actor_details(person, cast_list):
-            name = person["name"]
-            actor_id = person.personID
-            try:
-                actor = ia.get_person(actor_id)
-                image_url = actor.get("headshot")
-            except KeyError:
-                image_url = None
-            # Add the cast member details to the list
-            cast_list.append({"name": name, "image_url": image_url})
-
-        ia = IMDb()
-        movie = ia.get_movie(series.imdb_id)
-        cast_list = movie.get("cast")
-        cast = []
-
-        threads = []
-        for person in cast_list:
-            thread = threading.Thread(target=get_actor_details, args=(person, cast))
-            threads.append(thread)
-            thread.start()
-        # Wait for all threads to finish
-        for thread in threads:
-            thread.join()
-        """
 
     today = timezone.now().date()
     daily_views, created = DailySeriesViews.objects.get_or_create(tv_series=series, date=today)
@@ -154,29 +130,93 @@ def fetch_data_episode(request, imdb_id):
     }
     return JsonResponse(data)
 
-# class MoviesListView(ListView):
-#     model = Movie
-#
-#
-# class MoviesDetailView(DetailView):
-#     model = Movie
 
+class MovieListView(ListView):
+    model = Movie
+    template_name = 'moviegrid.html'
+    context_object_name = 'movies'
 
-# class WatchMovieView(View):
-#     def get(self, request, movie_id):
-#         movie = get_object_or_404(Movie, id=movie_id)
-#         movie.movie_view_count += 1
-#         movie.save()
-#         # Render the movie detail template
-#         return render(request, 'moviedetailed.html', {'movie': movie})
+    def get_queryset(self):
+        queryset = super().get_queryset()
 
+        # filter by name
+        search_query = self.request.GET.get('name')
+        # if name:
+        #     queryset = queryset.filter(title__icontains=name)
+        if search_query:
+            # Tokenize search query and remove stopwords
+            tokens = nltk.word_tokenize(search_query.lower())
+            tokens = [token for token in tokens if token not in STOPWORDS]
+            # Construct Q objects to search for similar titles and descriptions
+            title_q = Q(title__icontains=search_query)
+            desc_q = Q()
+            for token in tokens:
+                desc_q &= Q(plot_summary__icontains=token)
+            # Combine title and description queries using OR
+            queryset = queryset.filter(title_q | desc_q)
 
-# class MostWatchedMoviesView(View):
-#     def get(self, request):
-#         movies = Movie.objects.all().order_by('-view_count')
-#         return render(request, 'most_watched.html', {'movies': movies})
+        # filter by genre
+        genres = self.request.GET.getlist('genres')
+        if genres:
+            queryset = queryset.filter(genre__id__in=genres).distinct()
 
+        # sort by rating
+        rating = self.request.GET.get('rating')
+        if rating:
+            if rating == '5':
+                queryset = queryset.filter(movie_imdb__gte=5)
+            elif rating == '6':
+                queryset = queryset.filter(movie_imdb__gte=6)
+            elif rating == '7':
+                queryset = queryset.filter(movie_imdb__gte=7)
+            elif rating == '8':
+                queryset = queryset.filter(movie_imdb__gte=8)
+            elif rating == '9':
+                queryset = queryset.filter(movie_imdb__gte=9)
 
+        year_f = self.request.GET.get('year-from')
+        year_t = self.request.GET.get('year-to')
+        if year_f:
+            queryset = queryset.filter(year__gte=year_f)
+        if year_t:
+            queryset = queryset.filter(year__lte=year_t)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        page_size = int(self.request.GET.get('page_size', 12))
+        self.paginate_by = page_size  # Update the pagination property
+        movies = self.get_queryset()
+        paginator = Paginator(movies, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['movies'] = page_obj
+        context['paginator'] = page_obj.paginator
+        context['page_obj'] = page_obj
+        context['page_sizes'] = [10, 20]  # Add available page sizes to the context
+        context['movies_per_page'] = page_size
+
+        # add search and filter values to context
+        context['search_name'] = self.request.GET.get('name', '')
+        context['filter_genre'] = self.request.GET.getlist('genres', '')
+        context['filter_rating'] = self.request.GET.get('rating', '')
+        context['year_from'] = self.request.GET.get('year-from', '')
+        context['year_to'] = self.request.GET.get('year-to', '')
+
+        # get all available genres
+        context['genres'] = Genre.objects.all().order_by('title')
+        # context['load_more_url'] = reverse_lazy('load_more_movies')
+
+        return context
+
+    def get_paginate_by(self, queryset):
+        """
+        Return the number of items to paginate by based on the GET parameters.
+        """
+        page_size = self.request.GET.get('page_size', 10)
+        return int(page_size)
 
 
 

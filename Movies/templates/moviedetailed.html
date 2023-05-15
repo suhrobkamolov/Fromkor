@@ -80,6 +80,44 @@
                                 <div class="tab-content">
                                     <div id="overview" class="tab active">
                                         <div class="row">
+                                            <div id="links">
+                                              {% for url in movie_urls %}
+                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}')">{{ forloop.counter }} {{ url.channel }}</a>
+                                              {% endfor %}
+                                            </div>
+                                            <div id="iframe-container">
+                                                <iframe id="iframe" src="" allowfullscreen="yes" style="height: 100%; width: 100%;"
+                                                        onload="remove_loading()">
+                                                </iframe>
+                                            </div>
+                                            <script>
+                                                function changeLink(link) {
+                                                    var iframe = document.getElementById('iframe');
+                                                    iframe.src = link;
+
+                                                    var links = document.getElementById('links').getElementsByTagName('a');
+                                                    for (var i = 0; i < links.length; i++) {
+                                                        links[i].classList.remove('active');
+                                                    }
+
+                                                    event.currentTarget.classList.add('active');
+                                                }
+                                            </script>
+                                        </div>
+                                        <div class="title-hd-sm">
+                                                <h4>Plot Outline</h4>
+                                            </div>
+                                        {% comment %}
+                                        <div class="row">
+                                            <div class="video-player" style="width: 750px; height: 450px;">
+                                                <iframe id="the_frame" src="https://vidsrc.me/embed/tt{{ movie.imdb_id }}"
+                                                        frameborder="0" scrolling="no" allowfullscreen="yes" style="height: 100%; width: 100%;"
+                                                        onload="remove_loading()">
+                                                </iframe>
+                                            </div>
+                                        </div>
+                                        {% endcomment %}
+                                        <div class="row">
                                             <div class="col-md-8 col-sm-12 col-xs-12">
                                                 <p>{{ movie.plot_summary }}</p>
                                                 {% comment "Videos & Photos" %}

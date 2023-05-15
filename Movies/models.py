@@ -178,6 +178,8 @@ class Actor(models.Model):
         if not self.slug:
             self.slug = create_slug_series(self.actor_name)
 
+############# Movies ######################
+
 
 class Movie(models.Model):
     def upload_file_name(self, filename):
@@ -232,11 +234,6 @@ class Movie(models.Model):
         return reverse('Movie_Watch_View', args=[str(self.slug)])
 
     # Changing Movie image size before upload
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        image = Image.open(self.poster.path)
-        image = image.resize((285, 437), Image.ANTIALIAS)
-        image.save(self.poster.path)
 
 
 class DailyMovieViews(models.Model):
@@ -247,6 +244,12 @@ class DailyMovieViews(models.Model):
 
 class Comment(models.Model):
     product = models.ForeignKey(Movie, on_delete=models.CASCADE)
+
+
+class WatchMovieUrl(models.Model):
+    url = models.URLField()
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    channel = models.CharField(max_length=150)
 
 
 def create_slug(instance, new_slag=None):

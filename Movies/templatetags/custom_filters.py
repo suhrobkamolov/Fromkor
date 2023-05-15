@@ -1,5 +1,6 @@
 from django import template
 import datetime
+from urllib.parse import urlencode
 
 register = template.Library()
 
