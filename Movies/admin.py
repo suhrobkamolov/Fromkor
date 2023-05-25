@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries,\
-    Episode, DailySeriesEpisodeViews, WatchMovieUrl
+    Episode, DailySeriesEpisodeViews, WatchMovieUrl, ActorRoleByMovie, ActorRoleByEpisode
 
 from PIL import Image
 import requests
@@ -47,17 +47,6 @@ class TVSeriesAdmin(admin.ModelAdmin):
                     # check if old_obj.poster exists, and prompt user to confirm overwriting
                     if old_obj.poster:
                         old_obj.poster.delete(save=False)
-                        # response = input("Are you sure you want to change the existing poster image? (y/n): ")
-                        # if response.lower() != 'y':
-                        #     raise ValidationError('Cancelled. The poster image has not been changed.')
-                    # elif obj.poster and not old_obj.poster:
-                    #     super().save_model(request, obj, form, change)
-                    # else:
-                    #     if obj.poster_url:
-                    #         self.poster_url_change(obj)
-                    #     elif not obj.pk:
-                    #         super().save_model(request, obj, form, change)
-                    #     super().save_model(request, obj, form, change)
                 super().save_model(request, obj, form, change)
             elif obj.poster_url:
                 if old_obj.poster:
@@ -71,11 +60,6 @@ class TVSeriesAdmin(admin.ModelAdmin):
                 self.poster_url_change(obj)
                 super().save_model(request, obj, form, change)
         super().save_model(request, obj, form, change)  # continue with saving the object
-
-    # def get_changeform_initial_data(self, request):
-    #     initial = super().get_changeform_initial_data(request)
-    #     initial['fetch_data'] = False
-    #     return initial
 
 
 admin.site.register(TVSeries, TVSeriesAdmin)
@@ -152,55 +136,70 @@ class MovieAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
+        if obj.poster:
+            image = Image.open(obj.poster.path)
+            image = image.resize((285, 437), Image.ANTIALIAS)
+            image.save(obj.poster.path)
+            super().save_model(request, obj, form, change)
+        elif obj.poster_url:
+            url = obj.poster_url
+            response = requests.get(url)
+            image = Image.open(BytesIO(response.content))
+            image = image.resize((285, 437), Image.ANTIALIAS)
+            filestream = BytesIO()
+            image.save(filestream, 'JPEG')
+            filestream.seek(0)
+            obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
+            super().save_model(request, obj, form, change)
+
         if change:  # if editing an existing object
             old_obj = Movie.objects.get(pk=obj.pk)
-            if obj.poster:
-                old_obj.poster.delete(save=False)
-                image = Image.open(obj.poster.path)
-                image = image.resize((285, 437), Image.ANTIALIAS)
-                image.save(obj.poster.path)
-                super().save_model(request, obj, form, change)
-            elif obj.poster_url:
-                old_obj.poster.delete(save=False)
-                url = obj.poster_url
-                response = requests.get(url)
-                image = Image.open(BytesIO(response.content))
-                image = image.resize((285, 437), Image.ANTIALIAS)
-                filestream = BytesIO()
-                image.save(filestream, 'JPEG')
-                filestream.seek(0)
-                obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
-                super().save_model(request, obj, form, change)
-        else:
-            if obj.poster:
-                image = Image.open(obj.poster.path)
-                image = image.resize((285, 437), Image.ANTIALIAS)
-                image.save(obj.poster.path)
-                super().save_model(request, obj, form, change)
-            elif obj.poster_url:
-                url = obj.poster_url
-                response = requests.get(url)
-                image = Image.open(BytesIO(response.content))
-                image = image.resize((285, 437), Image.ANTIALIAS)
-                filestream = BytesIO()
-                image.save(filestream, 'JPEG')
-                filestream.seek(0)
-                obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
-                super().save_model(request, obj, form, change)
+            if old_obj.poster:
+                # if obj.poster:
+                #     old_obj.poster.delete(save=False)
+                #     image = Image.open(obj.poster.path)
+                #     image = image.resize((285, 437), Image.ANTIALIAS)
+                #     image.save(obj.poster.path)
+                #     super().save_model(request, obj, form, change)
+                if obj.poster_url:
+                    old_obj.poster.delete(save=False)
+                    url = obj.poster_url
+                    response = requests.get(url)
+                    image = Image.open(BytesIO(response.content))
+                    image = image.resize((285, 437), Image.ANTIALIAS)
+                    filestream = BytesIO()
+                    image.save(filestream, 'JPEG')
+                    filestream.seek(0)
+                    obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
+                    super().save_model(request, obj, form, change)
+
+        super().save_model(request, obj, form, change)
+
+
+class ActorAdmin(admin.ModelAdmin):
+    list_display = ['actor_name', 'slug', 'imdb_id', 'is_active']
+    list_filter = ['created_at', 'updated_at']
+    list_editable = ['is_active', ]
+    list_per_page = 50
+    ordering = ['-created_at']
+    search_fields = ['actor_name', 'imdb_id', ]
+    exclude = ('created_at', 'updated_at',)
+    prepopulated_fields = {'slug': ('actor_name',)}
 
 
 admin.site.register(Movie, MovieAdmin)
 
 admin.site.register(Company)
 admin.site.register(Producer)
-admin.site.register(Actor)
+admin.site.register(Actor, ActorAdmin)
 admin.site.register(DailyMovieViews)
 admin.site.register(DailySeriesEpisodeViews)
 admin.site.register(WatchMovieUrl)
+admin.site.register(ActorRoleByMovie)
+admin.site.register(ActorRoleByEpisode)
 
-# <iframe src="https://vk.com/video_ext.php?oid=202234924&id=456239899&hash=5d3f6b8743fe71f3" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
-# <iframe src="https://vk.com/video_ext.php?oid=-67429811&id=456242476&hash=f6debdff836c10c8" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+
+
 
 
 

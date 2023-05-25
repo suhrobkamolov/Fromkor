@@ -24,7 +24,7 @@
                         <div class="movie-btn">
                             <div class="btn-transform transform-vertical red">
                                 <div><a href="#" class="item item-1 redbtn"> <i class="ion-play"></i> Watch Movie</a></div>
-                                <div><a href="#" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
+                                <div name="play-movie"><a href="#" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
                             </div>
                         </div>
                     </div>
@@ -82,16 +82,18 @@
                                         <div class="row">
                                             <div id="links">
                                               {% for url in movie_urls %}
-                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}')">{{ forloop.counter }} {{ url.channel }}</a>
+                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}', event)">{{ forloop.counter }} {{ url.channel }}</a>
                                               {% endfor %}
                                             </div>
                                             <div id="iframe-container">
-                                                <iframe id="iframe" src="" allowfullscreen="yes" style="height: 100%; width: 100%;"
+                                                <iframe id="iframe" src="{% if movie_urls %}{{ movie_urls.0.url }}{% endif %}" allowfullscreen="yes" style="height: 100%; width: 100%;"
                                                         onload="remove_loading()">
                                                 </iframe>
                                             </div>
                                             <script>
                                                 function changeLink(link) {
+                                                    event.preventDefault(); // Prevent the default anchor tag behavior
+
                                                     var iframe = document.getElementById('iframe');
                                                     iframe.src = link;
 
@@ -448,13 +450,29 @@
                                             <div class="mvcast-item">
                                                 {% for c in cast %}
                                                 <div class="cast-it">
-                                                    <div class="cast-left">
-                                                        <img src="{{ c.actor_portrait }}" alt="">
-                                                        <a href="#">{{ c.actor_name }}{{ c.name }}</a>
-                                                    </div>
-                                                    <p>...  {{ c.currentRole }}</p>
+                                                    {% if c.name %}
+                                                        <div class="cast-left">
+                                                            <img src="{{ c.actor_portrait }}" alt="">
+                                                            <a href="#">{{ c.name }}</a>
+                                                        </div>
+                                                    {% elif c.actor_name %}
+                                                        <div class="cast-left">
+                                                            {% if c.actor_portrait %}<img src="{{ c.actor_portrait.url }}" alt="" width="50px" height="50px">{% endif %}
+                                                            <a href="#">{{ c.actor_name }}</a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if c.currentRole %}
+                                                        <p>... {{ c.currentRole }}</p>
+                                                    {% else %}
+                                                        {% for r in role %}
+                                                            {% if c.actor_name == r.actor.actor_name %}
+                                                                <p>... {{ r.role }}</p>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endif %}
                                                 </div>
-                                                {% endfor %}
+                                            {% endfor %}
+
                                             </div>
                                             <!-- //== -->
                                             <div class="title-hd-sm">

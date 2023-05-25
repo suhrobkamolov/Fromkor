@@ -116,11 +116,11 @@
                                 TV-Series <i class="fa fa-angle-down" aria-hidden="true"></i>
                                 </a>
                                 <ul class="dropdown-menu level1">
+                                    <li><a href="{% url 'movie_list' %}">All TV-Series</a></li>
                                     <li><a href="index-2.html">Tajik TV-Series</a></li>
                                     <li><a href="homev2.html">Turkish TV-Series</a></li>
                                     <li><a href="homev3.html">Russian TV-Series</a></li>
-                                    <li><a href="homev3.html">English TV-Series</a></li>
-                                    <li><a href="{% url 'movie_list' %}">Other TV-Series</a></li>
+                                    <li><a href="{% url 'movie_list' %}">English TV-Series</a></li>
                                 </ul>
                             </li>
                             <li class="dropdown first">
@@ -135,11 +135,11 @@
                                             <li><a href="aboutv2.html">About Us 02</a></li>
                                         </ul>
                                     </li> -->
-                                    <li><a href="moviegrid.html">Tajik Movies</a></li>
-                                    <li><a href="moviegridfw.html">Turkish Movies</a></li>
-                                    <li><a href="movielist.html">Russian Movies</a></li>
-                                    <li><a href="movielist.html">English Movies</a></li>
-                                    <li class="it-last"><a href="moviesingle.html">Other Movies</a></li>
+                                    <li><a href="{% url 'movie_list' %}">All Movies</a></li>
+                                    <li><a href="{% url 'movie_list' %}?origin=TJ">Tajik Movies</a></li>
+                                    <li><a href="{% url 'movie_list' %}?origin=TR">Turkish Movies</a></li>
+                                    <li><a href="{% url 'movie_list' %}?origin=RU">Russian Movies</a></li>
+                                    <li class="it-last"><a href="{% url 'movie_list' %}?origin=US">English Movies</a></li>
                                 </ul>
                             </li>
                             <li class="dropdown first">
@@ -147,10 +147,24 @@
                                 categories <i class="fa fa-angle-down" aria-hidden="true"></i>
                                 </a>
                                 <ul class="dropdown-menu level1">
-                                    <li><a href="celebritygrid01.html">celebrity grid 01</a></li>
-                                    <li><a href="celebritygrid02.html">celebrity grid 02 </a></li>
-                                    <li><a href="celebritylist.html">celebrity list</a></li>
-                                    <li class="it-last"><a href="celebritysingle.html">celebrity single</a></li>
+                                    {% for g in genres_context %}
+                                    <li><a href="{% url 'movie_list' %}?genres={{ g.id }}">{{ g.title }}</a></li>
+{#                                    <li><a href="{% url 'movie_list' %}?genres=22">ADVENTURE</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">ANIMATED</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">BIOGRAPHY</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">COMEDY</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">CRIME</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">DRAMA</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">FANTASY</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HISTORICAL</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HISTORY</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HORROR</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">MUSICAL</a></li>#}
+{#                                    <li><a href="{% url 'movie_list' %}?genres=4">ROMANCE</a></li>#}
+{#                                    <li><a href="celebritygrid02.html">celebrity grid 02 </a></li>#}
+{#                                    <li><a href="celebritylist.html">celebrity list</a></li>#}
+{#                                    <li class="it-last"><a href="celebritysingle.html">celebrity single</a></li>#}
+                                    {% endfor %}
                                 </ul>
                             </li>
                             <!--<li class="dropdown first">

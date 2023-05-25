@@ -34,7 +34,7 @@ def home(request):
         elif 'episode' in view:
             most_watched_items.append(Episode.objects.get(id=view['episode']))
     carousel_objects = Carousel.objects.all()
-    categoryset = Genre.objects.all()
+    categoryset = Genre.objects.order_by('title')
     queryset = Movie.objects.filter(created__gte=start_date)
     latest_episodes = Episode.objects.filter(created__gte=start_date)
     context = {

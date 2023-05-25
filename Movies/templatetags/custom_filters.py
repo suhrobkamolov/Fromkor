@@ -1,6 +1,5 @@
 from django import template
 import datetime
-from urllib.parse import urlencode
 
 register = template.Library()
 
@@ -46,6 +45,20 @@ def series_total_run_time(tv_series):
     else:
         return str(total_minutes)+'m'
 
+
+@register.simple_tag(takes_context=True)
+def get_filter_url(context, view):
+    request = context['request']
+    params = request.GET.copy()
+
+    # Remove existing 'view' parameter
+    if 'view' in params:
+        del params['view']
+
+    # Set the 'view' parameter to the desired value
+    params['view'] = view
+
+    return f"?{params.urlencode()}"
 
 
 

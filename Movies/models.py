@@ -26,9 +26,9 @@ STATUS_CHOICES = (
 MPAA = (
     ('G', 'General Audiences'),
     ('PG', 'Parental Guidance Suggested'),
-    ('PG13', 'Parents Strongly Cautioned'),
+    ('PG-13', 'Parents Strongly Cautioned'),
     ('R', 'Restricted'),
-    ('NC17', 'No Children 17 and Under Admitted'),
+    ('NC-17', 'No Children 17 and Under Admitted'),
 )
 
 
@@ -197,7 +197,7 @@ class Movie(models.Model):
         help_text="Use the following format: <YYYY>")
     plot_summary = models.TextField(null=True, blank=True)
     run_time = models.CharField(max_length=25, null=True, blank=True)
-    MPAA_rating = models.CharField(choices=MPAA, max_length=4, default='G')
+    MPAA_rating = models.CharField(choices=MPAA, max_length=6, default='G')
     genre = models.ManyToManyField(Genre, default='UNDEFINED')
     movie_imdb = models.FloatField(default=5.0)
     votes = models.PositiveIntegerField(blank=True, null=True)
@@ -236,6 +236,12 @@ class Movie(models.Model):
     # Changing Movie image size before upload
 
 
+class ActorRoleByMovie(models.Model):
+    actor = models.ForeignKey(Actor, on_delete=models.CASCADE, related_name='episode_act')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='actor_role_on_ep')
+    role = models.CharField(max_length=150)
+
+
 class DailyMovieViews(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     date = models.DateField()
@@ -250,6 +256,9 @@ class WatchMovieUrl(models.Model):
     url = models.URLField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     channel = models.CharField(max_length=150)
+
+    def __str__(self):
+        return f"{self.movie.title} (URL: {self.url})"
 
 
 def create_slug(instance, new_slag=None):
@@ -289,6 +298,7 @@ class TVSeries(models.Model):
     num_seasons = models.PositiveSmallIntegerField()
     description = models.TextField()
     genre = models.ManyToManyField(Genre, related_name='genres')
+    country_of_origin = CountryField(blank_label="(select country)", multiple=True, blank=True)
     poster = models.ImageField(upload_to=upload_file_name, null=True, blank=True)
     poster_url = models.URLField(blank=True, null=True)
     trailer = models.URLField(blank=True, null=True)
@@ -301,7 +311,7 @@ class TVSeries(models.Model):
     slug = models.SlugField(max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    MPAA_rating = models.CharField(choices=MPAA, max_length=4, default='G')
+    MPAA_rating = models.CharField(choices=MPAA, max_length=6, default='G')
     view_count = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     fetch_data = models.BooleanField(default=False)
@@ -321,44 +331,6 @@ class TVSeries(models.Model):
         super().save(*args, **kwargs)
         if not self.slug:
             self.slug = create_slug_series(self.title)
-
-    # @property
-    # def detailed_picture_show(self):
-    #     if self.poster:
-    #         return mark_safe(f'<img src={self.poster.url}></img>')
-    #     return mark_safe(f'<h3> No image to show </h3>')
-
-        # if self.poster_url:
-        #     # path = 'media/' + self.upload_file_name(self.title) + '.jpg'
-        #     # parts = path.rsplit('/', 1)
-        #     # result = f"{parts[0]}/{'/'.join(parts[1].split('/')[:-1])}"
-        #     # os.makedirs(result)
-        #     url = self.poster_url
-        #     response = requests.get(url)
-        #     image = Image.open(BytesIO(response.content))
-        #     image = image.resize((285, 437), Image.ANTIALIAS)
-        #     filestream = BytesIO()
-        #     image.save(filestream, 'JPEG')
-        #     filestream.seek(0)
-        #     self.poster.save(self.poster_url.split('/')[-1], File(filestream), save=False)
-
-
-# @receiver(pre_save, sender=TVSeries)
-# def update_tvseries_fields(sender, instance, **kwargs):
-#     if instance.IMDbid:
-#         ia = IMDb()
-#         imdb_data = ia.get_movie(instance.IMDbid)
-#         genres = imdb_data['genres']
-#
-#         # populate other fields based on retrieved data
-#         # instance.genre.set([Genre.objects.get_or_create(name=genre)[0] for genre in genres])
-#         instance.name = imdb_data.get('title')
-#         # instance.release_date = imdb_data.get('year')
-#         instance.num_seasons = imdb_data['seasons']
-#         instance.description = imdb_data.get('plot outline')
-#         instance.poster_url = imdb_data.get('full-size cover url')
-#         instance.rating = imdb_data.get('rating')
-#         # instance.trailer = imdb_data.get('trailer')
 
 
 class Episode(models.Model):
@@ -427,6 +399,12 @@ class DailySeriesEpisodeViews(models.Model):
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
     date = models.DateField()
     views = models.PositiveIntegerField(default=0)
+
+
+class ActorRoleByEpisode(models.Model):
+    actor = models.ForeignKey(Actor, on_delete=models.CASCADE, related_name='movie_act')
+    episode = models.ForeignKey(Episode, on_delete=models.CASCADE, related_name='actor_role')
+    role = models.CharField(max_length=150)
 
 
 

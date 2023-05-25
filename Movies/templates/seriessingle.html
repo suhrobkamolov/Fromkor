@@ -318,7 +318,7 @@
                                             {#    Links   #}
                                             <div id="links">
                                               {% for url in movie_urls %}
-                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}')">{{ forloop.counter }} {{ url.channel }}</a>
+                                                <a href="#" {% if forloop.first %}class="active"{% endif %} onclick="changeLink('{{ url.url }}', event)">{{ forloop.counter }} {{ url.channel }}</a>
                                               {% endfor %}
                                             </div>
                                             <div id="iframe-container">
@@ -328,6 +328,8 @@
                                             </div>
                                             <script>
                                                 function changeLink(link) {
+                                                    event.preventDefault(); // Prevent the default anchor tag behavior
+
                                                     var iframe = document.getElementById('iframe');
                                                     iframe.src = link;
 
