@@ -1,16 +1,16 @@
 {% extends 'head.html' %}
-{% block head_title %}SUHA{% endblock %}
+{% block head_title %}{{ movie.title }}{% endblock %}
 {% load static %}
 {% block content %}
     <div class="hero mv-single-hero">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <!-- <h1> movie listing - list</h1>
-                    <ul class="breadcumb">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li> <span class="ion-ios-arrow-right"></span> movie listing</li>
-                    </ul> -->
+{#                    <!-- <h1> movie listing - list</h1>#}
+{#                    <ul class="breadcumb">#}
+{#                        <li class="active"><a href="#">Home</a></li>#}
+{#                        <li> <span class="ion-ios-arrow-right"></span> movie listing</li>#}
+{#                    </ul> -->#}
                 </div>
             </div>
         </div>
@@ -32,9 +32,16 @@
                 <div class="col-md-8 col-sm-12 col-xs-12">
                     <div class="movie-single-ct main-content">
                         <h1 class="bd-hd">{{ movie.title }} <span> {{ movie.year }}</span></h1>
-                        {% comment "socialbutton" %}
                         <div class="social-btn">
-                            <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
+                            {% if user.is_authenticated  %}
+                                {% if movie.id in favorite_movies %}
+                                    <a href="#" class="parent-btn add-to-favorite checked" data-movie-id="{{ movie.id }}"><i class="ion-checkmark"></i> Added to Favorite</a>
+                                {% else %}
+                                    <a href="#" class="parent-btn add-to-favorite" data-movie-id="{{ movie.id }}"><i class="ion-heart"></i> Add to Favorite</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url "account_login" %}" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
+                            {% endif %}
                             <div class="hover-bnt">
                                 <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
                                 <div class="hvr-item">
@@ -45,7 +52,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% endcomment %}
                         <div class="movie-rate">
                             <div class="rate">
                                 <i class="ion-android-star"></i>

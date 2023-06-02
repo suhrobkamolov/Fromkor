@@ -5,10 +5,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django_countries.fields import CountryField
 import datetime
-from PIL import Image
 
-
-# Create your models here.
 
 STATUS_CHOICES = (
     ('EN', 'English'),
@@ -199,7 +196,7 @@ class Movie(models.Model):
     run_time = models.CharField(max_length=25, null=True, blank=True)
     MPAA_rating = models.CharField(choices=MPAA, max_length=6, default='G')
     genre = models.ManyToManyField(Genre, default='UNDEFINED')
-    movie_imdb = models.FloatField(default=5.0)
+    movie_imdb = models.FloatField(default=5.0, null=True, blank=True)
     votes = models.PositiveIntegerField(blank=True, null=True)
     director = models.ManyToManyField(Producer, related_name="movie_director", default=".")
     producer = models.ManyToManyField(Producer, related_name="movie_producer", default='UNDEFINED')

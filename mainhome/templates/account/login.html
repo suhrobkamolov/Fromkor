@@ -1,0 +1,74 @@
+{% extends "head.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+    <div class="hero user-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <h1>LOG-IN PAGE</h1>
+                        <ul class="breadcumb">
+                            <li class="active"><a href="{% url "home" %}">Home</a></li>
+                            <li> <span class="ion-ios-arrow-right"></span>LOG IN</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row ipad-width">
+                <div class="col-md-9 col-sm-12 col-xs-12" style="width: 100%">
+                    <div class="form-style-1 user-pro">
+                        <h4>{% trans "Sign In" %}</h4>
+
+                        {% get_providers as socialaccount_providers %}
+
+                        <form class="login" method="POST" action="{% url 'account_login' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            {% if redirect_field_value %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <input name="primaryAction" class="submit" type="submit" value="{% trans "Sign In" %}">
+                                </div>
+                                <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                            </div>
+                            {% comment %}<button class="primaryAction" type="submit">{% trans "Sign In" %}</button>{% endcomment %}
+                        </form>
+
+                        <div class="social-login">
+                            {% if socialaccount_providers %}
+                                <div class="row">
+                                    <h4 style="margin-top: 30px">Or via social</h4>
+                                </div>
+                                <p style="font-size: 18px">{% blocktrans with site.name as site_name %}Please sign in with one
+                                of your existing third party accounts. Or, <a style="color: #ffdddd;" href="{{ signup_url }}" onmouseover="this.style.color='red';" onmouseout="this.style.color='#ffdddd';">Sign up</a>
+                                for a {{ site_name }} account. {% endblocktrans %}</p>
+                                <div class="row">
+                                    <div class="social-btn-2">
+                                        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                                    </div>
+                                    {#<div class="login-or">{% trans 'or' %}</div>#}
+                                </div>
+                                {% include "socialaccount/snippets/login_extra.html" %}
+                            {% else %}
+                                <p style="font-size: 18px">{% blocktrans %}If you have not created an account yet, then please
+                                <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

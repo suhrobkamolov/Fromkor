@@ -1,0 +1,130 @@
+{% extends 'head.html' %}
+{% block head_title %}{{ user.username }} PROFILE {% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class="hero user-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <h1>{% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}’s profile</h1>
+                        <ul class="breadcumb">
+                            <li class="active"><a href="{% url "home" %}">Home</a><span class="ion-ios-arrow-right"></span></li>
+                            <li class="active"><a href="{% url "profile_view" %}">Profile</a></li>
+                            <li> <span class="ion-ios-arrow-right"></span>Update Profile</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row ipad-width">
+                {% include 'account/user_sidebar.html' %}
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div class="form-style-1 user-pro">
+                        <form method="post" class="user" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <h4>Profile details</h4>
+                            {% if errors %}
+                                {% for e in errors %}
+                                    <p style="color: red; font-size: 16px">{{ e }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-6 form-it">
+                                    <label>Username</label>
+                                    <input name="username" style="color: black; font-size: 24px; font-weight: bold" type="text" value="{{ user.username }}">
+                                </div>
+                                <div class="col-md-6 form-it">
+                                    <label>Email Address</label>
+                                    <input name="user-email" style="color: black; font-size: 24px; font-weight: bold" type="text" value="{{ user.email }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-it">
+                                    <label>First Name</label>
+                                    <input name="first-name" style="color: black; font-size: 24px; font-weight: bold" type="text" value="{{ user.first_name }}">
+                                </div>
+                                <div class="col-md-6 form-it">
+                                    <label>Last Name</label>
+                                    <input name="last-name" style="color: black; font-size: 24px; font-weight: bold" type="text" value="{{ user.last_name }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-it">
+                                    <label>Country</label>
+                                    <select name="country">
+                                        <option value="">(select country)</option>
+                                        {% for code, name in country_choices %}
+                                            <option value="{{ code }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 form-it">
+                                    <label>Avatar</label>
+                                    <input type="file" name="avatar">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-it">
+                                    <label>Current Avatar</label>
+                                    {% if user_profile.avatar %}
+                                        <a class="img-lightbox" data-fancybox-group="gallery" href="{{ user_profile.avatar.url }}">
+                                            <img src="{{ user_profile.avatar.url }}" alt="Current Avatar" width="300px" height="300px">
+                                        </a>
+                                        <br>
+                                        <button onclick="removeAvatar()">Remove Avatar</button>
+                                    {% else %}
+                                        <p>No avatar uploaded</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <input class="submit" type="submit" value="save">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function removeAvatar() {
+            if (confirm("Are you sure you want to remove the avatar?")) {
+                // Get the CSRF token from the cookie
+                const csrftoken = getCookie('csrftoken');
+
+                // Send an AJAX request to your Django view to remove the avatar
+                fetch('/profile/update/remove-avatar/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    },
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Reload the page or update the UI as needed
+                            window.location.reload();
+                        } else {
+                            console.error('Failed to remove the avatar');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('An error occurred:', error);
+                    });
+            }
+        }
+
+        // Function to get the CSRF token from the cookie
+        function getCookie(name) {
+            const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+    </script>
+
+{% endblock %}

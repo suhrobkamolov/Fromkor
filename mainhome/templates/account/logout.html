@@ -1,0 +1,42 @@
+{% extends "head.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign Out" %}{% endblock %}
+
+{% block content %}
+    <div class="hero common-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <div class="card-header">
+                            <h1 class="text-center">{% trans "Sign Out" %}</h1>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center">{% trans 'Are you sure you want to sign out?' %}</p>
+                            <form method="post" action="{% url 'account_logout' %}">
+                                {% csrf_token %}
+                                {% if redirect_field_value %}
+                                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                                {% endif %}
+                                <div class="text-center">
+                                    <button class="btn btn-primary" type="submit">{% trans 'Sign Out' %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    {% include "account/blockuserprofile.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

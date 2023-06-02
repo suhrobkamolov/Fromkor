@@ -36,12 +36,24 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECRET_KEY = 'django-insecure-$7i7f++l$8ko5t0f8+#vaw&i90q*=lku&#^2^=8kh5yjfrg_z+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
+
+# Allauth
+SITE_ID = 1
+
+# allauth
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -63,27 +75,22 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     # ... include the providers you want to enable:
-    'allauth.socialaccount.providers.apple',
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.twitter',
+    # 'allauth.socialaccount.providers.twitter',
 ]
-# Allauth
-SITE_ID = 1
 
 # Provider specific settings
+'''
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
+    'twitter': {
         'APP': {
-            'client_id': '123',
-            'secret': '456',
-            'key': ''
+            'consumer_key': 'f4LdzuvEsxDWUF4hairZvjV3y',
+            'consumer_secret': 'zCX8JOAHtkFqxF4KtDfZEKhbygqNkBY09hg72BhSHhXXjsoVV4',
+            'access_token': '1517200343700062210-dSo39o4R9RelO0LWHPmcZ8NkgZU3RL',
+            'access_token_secret': 'eG2Ibo9jTpyLtbJ8I5JxQlU2moDW6JQsyaCPaqB0lBfC2',
         }
     }
 }
+'''
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,14 +123,6 @@ TEMPLATES = [
     },
 ]
 
-# allauth
-AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-
-    # `allauth` specific authentication methods, such as login by e-mail
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
 
 WSGI_APPLICATION = 'Fromkor.wsgi.application'
 
@@ -167,7 +166,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -190,3 +189,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 django_heroku.settings(locals(), databases=False)
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'moviefymovie@gmail.com'  # Replace with your Gmail email address
+EMAIL_HOST_PASSWORD = 'zillkirhiueyflgp'  # Replace with your Gmail password or app-specific password
+

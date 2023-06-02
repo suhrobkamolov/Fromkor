@@ -1,5 +1,5 @@
 {% extends 'head.html' %}
-{% block head_title %}SUHA{% endblock %}
+{% block head_title %}TV-Series{% endblock %}
 {% load static %}
 {% block content %}
 {% load custom_filters %}
@@ -25,10 +25,10 @@
                     <form method="get" action="">
                         <div class="topbar-filter">
                             {% if search_name or filter_rating or filter_genre or year_to or year_from or origin %}
-                                <p>Found <span>the following</span> movies</p>
+                                <p>Found <span>the following</span> series</p>
                             {% endif %}
                             <label>Sort by:</label>
-                            <select name="sort-by">
+                            <select name="sort-by" disabled>
                                 <option value="recommended" {% if sort_by == 'recommended' %}selected{% endif %}>Recommended</option>
                                 <option value="rating-d" {% if sort_by == 'rating-d' %}selected{% endif %}>Rating Descending &#x2193;</option>
                                 <option value="rating-a" {% if sort_by == 'rating-a' %}selected{% endif %}>Rating Ascending &#x2191;</option>
@@ -47,13 +47,13 @@
                             <div class="flex-wrap-movielist">
                             {% for m in movies %}
                                 <div class="movie-item-style-2 movie-item-style-1">
-                                    <img src="{{ m.poster.url }}" alt="{{ m.title}}">
+                                    <a href="{{ m.get_absolute_url }}"><img src="{{ m.poster.url }}" alt="{{ m.title}}"></a>
                                     <div class="hvr-inner">
                                         <a  href="{{ m.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
                                     </div>
                                     <div class="mv-item-infor">
-                                        <h6><a href="#">{{ m.title }}</a></h6>
-                                        <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie_imdb }}</span> /10</p>
+                                        <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} ({{ m.release_year }})</a></h6>
+                                        <p class="rate"><i class="ion-android-star"></i><span>{{ m.rating }}</span> /10</p>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -63,12 +63,12 @@
                                 <div class="movie-item-style-2">
                                     <img src="{{ m.poster.url }}" alt="" width="25%">
                                     <div class="mv-item-infor">
-                                        <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} <span>({{ m.year }})</span></a></h6>
-                                        <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie_imdb }}</span> /10</p>
-                                        <p class="describe">{{ m.plot_summary|slice:":255" }}...</p>
-                                        <p class="run-time"> Run Time: {{ m.run_time }}’    .     <span>MMPA: {{ m.MPAA_rating }} </span>    .     <span>Release: {{ m.release_date }}</span></p>
-                                        <p>Director: <a href="#">{{ m.director.0 }}</a></p>
-                                        <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="#">{{ c.actor_name }},</a>{% endfor %}</p>
+                                        <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} <span>({{ m.release_year }})</span></a></h6>
+                                        <p class="rate"><i class="ion-android-star"></i><span>{{ m.rating }}</span> /10</p>
+                                        <p class="describe">{{ m.description|slice:":255" }}...</p>
+                                        <p class="run-time">MMPA: {{ m.MPAA_rating }}    .     <span>Release: {{ m.release_date }}</span></p>
+                                        <p>Directors: {% for d in m.director.all|slice:":3" %}{{ d.producer_name }}, {% endfor %}</p>
+                                        <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="">{{ c.actor_name }},</a>{% endfor %}</p>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -78,7 +78,7 @@
                                 <div class="center" style="display: flex; flex-direction: column; align-items: center;">
                                 <img src="{% static 'images/confused.gif' %}" alt="confused">
                                 <div class="mv-item-infor">
-                                    <h6>Based on your search criteria Movies not Found!</h6>
+                                    <h6>Based on your search criteria nothing Found!</h6>
                                 </div>
                                 </div>
                             </div>
@@ -123,7 +123,7 @@
                     <div class="sidebar">
                         <div class="searh-form">
                             <h4 class="sb-title">Search for movie</h4>
-                            <form class="form-style-1" method="get" action="{% url 'movie_list' %}?view={{ request.GET.view }}">
+                            <form class="form-style-1" method="get" action="{% url 'tvseries_list' %}?view={{ request.GET.view }}">
                                 <div class="row">
                                     <div class="col-md-12 form-it">
                                         <label>Movie name</label>
@@ -191,7 +191,7 @@
                             </form>
                         </div>
                         <div class="ads">
-                            <img src="images/uploads/ads1.png" alt="">
+                            <img src="{% static "images/lion.png" %}" alt="lion">
                         </div>
                         <div class="sb-facebook sb-it">
                             <h4 class="sb-title">Find us on Youtube</h4>

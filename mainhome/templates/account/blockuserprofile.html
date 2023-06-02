@@ -1,0 +1,25 @@
+{% if messages %}
+  <div class="messages">
+    <h1><strong>Messages:</strong></h1>
+    <ul>
+      {% for message in messages %}
+        <li><h3 style="color: #acc6c6">{{ message }}</h3></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% comment %}
+<div class="block-menu">
+  <h1><strong>Menu:</strong></h1>
+  <ul>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+      <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+    {% else %}
+      <li><a href="{% url 'account_login' %}">Sign In</a></li>
+      <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endcomment %}

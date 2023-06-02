@@ -1,0 +1,254 @@
+{% extends 'head.html' %}
+{% block head_title %}Search Result{% endblock %}
+{% load static %}
+{% block content %}
+{% load custom_filters %}
+    <div class="hero common-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <h1> Result for the "{{ search_query }}" </h1>
+                        <ul class="breadcumb">
+                            <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                            <li> <span class="ion-ios-arrow-right"></span> Search Result </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row ipad-width">
+                <div class="col-md-8 col-sm-12 col-xs-12">
+                    <form method="get" action="">
+                        <div class="topbar-filter">
+                            {% if search_name or filter_rating or filter_genre or year_to or year_from or origin %}
+                                <p>Found <span>the following</span> movies</p>
+                            {% endif %}
+                            <label>Sort by:</label>
+                            <select name="sort-by">
+                                <option value="recommended" {% if sort_by == 'recommended' %}selected{% endif %}>Recommended</option>
+                                <option value="rating-d" {% if sort_by == 'rating-d' %}selected{% endif %}>Rating Descending &#x2193;</option>
+                                <option value="rating-a" {% if sort_by == 'rating-a' %}selected{% endif %}>Rating Ascending &#x2191;</option>
+                                <option value="latest-d" {% if sort_by == 'latest-d' %}selected{% endif %}>Latest Added Descending &#x2193;</option>
+                                <option value="latest-a" {% if sort_by == 'latest-a' %}selected{% endif %}>Latest Added Ascending &#x2191;</option>
+                                <option value="year-d" {% if sort_by == 'year-d' %}selected{% endif %}>Release Year Descending &#x2193;</option>
+                                <option value="year-a" {% if sort_by == 'year-a' %}selected{% endif %}>Release Year Ascending &#x2191;</option>
+                            </select>
+                            <a href="{% get_filter_url 'list' %}" class="list"><i class="ion-ios-list-outline {% if list_view %}active{% endif %}"></i></a>
+                            <a href="{% get_filter_url 'grid' %}" class="grid"><i class="ion-grid {% if grid_view %}active{% endif %}"></i></a>
+                        </div>
+                    </form>
+                    <div>
+                        {% if movies|length != 0 %}
+                            {% if grid_view %}
+                                {% if search_option == 'movies' %}
+                                    <div class="flex-wrap-movielist">
+                                    {% for m in movies %}
+                                        <div class="movie-item-style-2 movie-item-style-1">
+                                            <img src="{{ m.poster.url }}" alt="{{ m.title}}">
+                                            <div class="hvr-inner">
+                                                <a  href="{{ m.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
+                                            </div>
+                                            <div class="mv-item-infor">
+                                                <h6><a href="#">{{ m.title }}</a></h6>
+                                                <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie_imdb }}</span> /10</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                {% elif search_option == 'tv-series' %}
+                                    <div class="flex-wrap-movielist">
+                                    {% for m in movies %}
+                                        <div class="movie-item-style-2 movie-item-style-1">
+                                            <a href="{{ m.get_absolute_url }}"><img src="{{ m.poster.url }}" alt="{{ m.title}}"></a>
+                                            <div class="hvr-inner">
+                                                <a  href="{{ m.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
+                                            </div>
+                                            <div class="mv-item-infor">
+                                                <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} ({{ m.release_year }})</a></h6>
+                                                <p class="rate"><i class="ion-android-star"></i><span>{{ m.rating }}</span> /10</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% elif list_view %}
+                                {% if search_option == 'movies' %}
+                                    {% for m in movies %}
+                                    <div class="movie-item-style-2">
+                                        <img src="{{ m.poster.url }}" alt="" width="25%">
+                                        <div class="mv-item-infor">
+                                            <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} <span>({{ m.year }})</span></a></h6>
+                                            <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie_imdb }}</span> /10</p>
+                                            <p class="describe">{{ m.plot_summary|slice:":255" }}...</p>
+                                            <p class="run-time"> Run Time: {{ m.run_time }}’    .     <span>MMPA: {{ m.MPAA_rating }} </span>    .     <span>Release: {{ m.release_date }}</span></p>
+                                            <p>Director: {% for d in m.director.all|slice:":3" %}<a href="">{{ d.producer_name }}, </a>{% endfor %}</p>
+                                            <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="#">{{ c.actor_name }}, </a>{% endfor %}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% elif search_option == 'tv-series' %}
+                                    {% for m in movies %}
+                                        <div class="movie-item-style-2">
+                                            <img src="{{ m.poster.url }}" alt="" width="25%">
+                                            <div class="mv-item-infor">
+                                                <h6><a href="{{ m.get_absolute_url }}">{{ m.title }} <span>({{ m.release_year }})</span></a></h6>
+                                                <p class="rate"><i class="ion-android-star"></i><span>{{ m.rating }}</span> /10</p>
+                                                <p class="describe">{{ m.description|slice:":255" }}...</p>
+                                                <p class="run-time">MMPA: {{ m.MPAA_rating }}    .     <span>Release: {{ m.release_date }}</span></p>
+                                                <p>Directors: {% for d in m.director.all|slice:":3" %}{{ d.producer_name }}, {% endfor %}</p>
+                                                <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="">{{ c.actor_name }},</a>{% endfor %}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <div class="row">
+                                <div class="center" style="display: flex; flex-direction: column; align-items: center;">
+                                <img src="{% static 'images/confused.gif' %}" alt="confused">
+                                <div class="mv-item-infor">
+                                    <h6>Based on your search criteria Movies not Found!</h6>
+                                </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <form method="get" action="">
+                        <div class="topbar-filter">
+                            <label>Movies per page:</label>
+                            <select name="page_size" disabled>
+                                <option value="12" {% if movies_per_page == 12 %}selected{% endif %}>12</option>
+                                <option value="24" {% if movies_per_page == 24 %}selected{% endif %}>24</option>
+                                <option value="40" {% if movies_per_page == 40 %}selected{% endif %}>40</option>
+                            </select>
+                            <noscript><input type="submit" value="Submit"></noscript>
+
+                            <div class="pagination2">
+                                <span>Page {{ movies.number }} of {{ movies.paginator.num_pages }}:</span>
+                                {% if movies.has_previous %}
+                                    <a href="?page={{ movies.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_option %}&search-for={{ search_option }}{% endif %}{% if sort_by %}&sort-by={{ sort_by }}{% endif %}{% if list_view %}&view=list{% endif %}{% if grid_view %}&view=grid{% endif %}{% if movies_per_page %}&page_size={{ movies_per_page }}{% endif %}"><i class="ion-arrow-left-b"> Previous </i></a>
+                                {% else %}
+                                    <a class="disabled"><i class="ion-arrow-left-b"> Previous </i></a>
+                                {% endif %}
+                                {% comment %}
+                                {% for i in movies.paginator.page_range %}
+                                    {% if movies.number == i %}
+                                        <a class="active">{{ i }}</a>
+                                    {% else %}
+                                        <a href="?page={{ i }}{% if search_name %}&name={{ search_name }}{% endif %}{% if filter_genre %}&genre={{ filter_genre }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if movies_per_page %}&per_page={{ movies_per_page }}{% endif %}">{{ i }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                {% endcomment %}
+                                {% if movies.has_next %}
+                                    <a href="?page={{ movies.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_option %}&search-for={{ search_option }}{% endif %}{% if sort_by %}&sort-by={{ sort_by }}{% endif %}{% if list_view %}&view=list{% endif %}{% if grid_view %}&view=grid{% endif %}{% if movies_per_page %}&page_size={{ movies_per_page }}{% endif %}"> Next <i class="ion-arrow-right-b"></i></a>
+                                {% else %}
+                                    <a class="disabled"> Next <i class="ion-arrow-right-b"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="sidebar">
+                        <div class="searh-form">
+                            <h4 class="sb-title">Search for movie</h4>
+                            <form class="form-style-1" method="get" action="{% url 'movie_list' %}?view={{ request.GET.view }}">
+                                <div class="row">
+                                    <div class="col-md-12 form-it">
+                                        <label>Movie name</label>
+                                        <input type="search" name="name" placeholder="Enter movie name" value="{{ search_name }}">
+                                    </div>
+                                    <div class="col-md-12 form-it">
+                                        <label>Genres & Subgenres</label>
+                                        <div class="group-ip">
+                                            <select name="genres" multiple="" class="ui fluid dropdown">
+                                                <option value="">All...</option>
+                                                {% for genre in genres %}
+                                                    <option value="{{ genre.id }}" {% if genre.id|stringformat:"s" in filter_genre %}selected{% endif %}>{{ genre.title }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 form-it">
+                                        <label>Rating Range</label>
+                                        <select name="rating">
+                                          <option value="All">-- All --</option>
+                                          <option value="5" {% if filter_rating == '5' %}selected{% endif %}>Above 5</option>
+                                          <option value="6" {% if filter_rating == '6' %}selected{% endif %}>Above 6</option>
+                                          <option value="7" {% if filter_rating == '7' %}selected{% endif %}>Above 7</option>
+                                          <option value="8" {% if filter_rating == '8' %}selected{% endif %}>Above 8</option>
+                                          <option value="9" {% if filter_rating == '9' %}selected{% endif %}>Above 9</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 form-it">
+                                        <label>Release Year</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <input name="year-from" type="number" min="1800" max="2024" placeholder="From" value="{{ year_from }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input name="year-to" type="number" min="1800" max="2024" placeholder="To" value="{{ year_to }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 form-it">
+                                        <label>Sort by:</label>
+                                        <select name="sort-by" onchange="this.form.submit()">
+                                            <option value="recommended" {% if sort_by == 'recommended' %}selected{% endif %}>Recommended</option>
+                                            <option value="rating-d" {% if sort_by == 'rating-d' %}selected{% endif %}>Rating Descending &#x2193;</option>
+                                            <option value="rating-a" {% if sort_by == 'rating-a' %}selected{% endif %}>Rating Ascending &#x2191;</option>
+                                            <option value="latest-d" {% if sort_by == 'latest-d' %}selected{% endif %}>Latest Added Descending &#x2193;</option>
+                                            <option value="latest-a" {% if sort_by == 'latest-a' %}selected{% endif %}>Latest Added Ascending &#x2191;</option>
+                                            <option value="year-d" {% if sort_by == 'year-d' %}selected{% endif %}>Release Year Descending &#x2193;</option>
+                                            <option value="year-a" {% if sort_by == 'year-a' %}selected{% endif %}>Release Year Ascending &#x2191;</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 form-it">
+                                        <label>Country of origin:</label>
+                                        <select name="origin">
+                                            <option value="ALL" {% if origin == 'ALL' %}selected{% endif %}>ALL</option>
+                                            <option value="US" {% if origin == 'US' %}selected{% endif %}>ENGLISH</option>
+                                            <option value="TR" {% if origin == 'TR' %}selected{% endif %}>TURKISH</option>
+                                            <option value="TJ" {% if origin == 'TJ' %}selected{% endif %}>TAJIK</option>
+                                            <option value="RU" {% if origin == 'RU' %}selected{% endif %}>RUSSIAN</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 ">
+                                        <input class="submit" type="submit" value="SEARCH">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="ads">
+                            <img src="images/uploads/ads1.png" alt="">
+                        </div>
+                        <div class="sb-facebook sb-it">
+                            <h4 class="sb-title">Find us on Youtube</h4>
+                            <h1><a href="https://www.youtube.com/channel/UCTGtd7CqMrjYlDU0JFypeQQ" target="_blank" rel="noopener noreferrer">Youtube</a>Youtube</h1>
+                            <iframe src="#" data-src="https://www.youtube.com/embed/BJLJbnJraj4"  height="315" style="width:100%;border:none;overflow:hidden" ></iframe>
+                        </div>
+                        <div class="sb-twitter sb-it">
+                            <h4 class="sb-title">Tweet to us</h4>
+                            <div class="slick-tw">
+                                <div class="tweet item" id="https://twitter.com/MehvarC"><!-- Put your twiter id here -->
+                                </div>
+                                <div class="tweet item" id=""><!-- Put your 2nd twiter account id here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+
+

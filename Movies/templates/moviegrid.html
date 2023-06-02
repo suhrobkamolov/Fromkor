@@ -1,5 +1,5 @@
 {% extends 'head.html' %}
-{% block head_title %}SUHA{% endblock %}
+{% block head_title %}Movies{% endblock %}
 {% load static %}
 {% block content %}
 {% load custom_filters %}
@@ -47,7 +47,7 @@
                             <div class="flex-wrap-movielist">
                             {% for m in movies %}
                                 <div class="movie-item-style-2 movie-item-style-1">
-                                    <img src="{{ m.poster.url }}" alt="{{ m.title}}">
+                                    <img src="{{ m.poster.url }}" alt="{{ m.title }}">
                                     <div class="hvr-inner">
                                         <a  href="{{ m.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
                                     </div>
@@ -67,8 +67,8 @@
                                         <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie_imdb }}</span> /10</p>
                                         <p class="describe">{{ m.plot_summary|slice:":255" }}...</p>
                                         <p class="run-time"> Run Time: {{ m.run_time }}’    .     <span>MMPA: {{ m.MPAA_rating }} </span>    .     <span>Release: {{ m.release_date }}</span></p>
-                                        <p>Director: <a href="#">{{ m.director.0 }}</a></p>
-                                        <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="#">{{ c.actor_name }},</a>{% endfor %}</p>
+                                        <p>Director: {% for d in m.director.all|slice:":3" %}<a href="">{{ d.producer_name }}, </a>{% endfor %}</p>
+                                        <p>Stars: {% for c in m.cast.all|slice:":3" %}<a href="#">{{ c.actor_name }}, </a>{% endfor %}</p>
                                     </div>
                                 </div>
                                 {% endfor %}

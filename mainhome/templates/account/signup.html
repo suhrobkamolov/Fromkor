@@ -1,0 +1,48 @@
+{% extends "head.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+    <div class="hero user-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <h1>SIGN UP</h1>
+                        <ul class="breadcumb">
+                            <li class="active"><a href="{% url "home" %}">Home</a></li>
+                            <li> <span class="ion-ios-arrow-right"></span>Sign Up</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row ipad-width">
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div class="form-style-1 user-pro">
+                        <h4>{% trans "Sign Up" %}</h4>
+                        <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+                        <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+                          {% csrf_token %}
+                          {{ form.as_p }}
+                          {% if redirect_field_value %}
+                          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                          {% endif %}
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <input class="submit" type="submit" value="{% trans 'Sign Up' %} &raquo;">
+                                </div>
+                            </div>
+                          {% comment %}<button type="submit">{% trans "Sign Up" %} &raquo;</button>{% endcomment %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -14,18 +14,19 @@
         <div class="login-content">
             <a href="#" class="close">x</a>
             <h3>Login</h3>
-            <form method="post" action="#">
+            <form method="post" action="{% url 'custom_account_login' %}?next={{ request.path }}">
+                {% csrf_token %}
                 <div class="row">
                      <label for="username">
                         Username:
-                        <input type="text" name="username" id="username" placeholder="Hugh Jackman" pattern="^[a-zA-Z][a-zA-Z0-9-_\.]{8,20}$" required="required" />
+                        <input type="text" name="username" id="username" placeholder="Hugh Jackman" pattern="^[a-zA-Z][a-zA-Z0-9-_\.]{3,20}$" required="required" />
                     </label>
                 </div>
 
                 <div class="row">
                     <label for="password">
                         Password:
-                        <input type="password" name="password" id="password" placeholder="******" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required="required" />
+                        <input type="password" name="password" id="password" placeholder="******" required="required" />
                     </label>
                 </div>
                 <div class="row">
@@ -33,20 +34,23 @@
                         <div>
                             <input type="checkbox" name="remember" value="Remember me"><span>Remember me</span>
                         </div>
-                        <a href="#">Forget password ?</a>
+                        <a href="{% url 'account_reset_password' %}">Forget password ?</a>
                     </div>
                 </div>
                <div class="row">
                  <button type="submit">Login</button>
                </div>
             </form>
+            {% comment %}
             <div class="row">
                 <p>Or via social</p>
                 <div class="social-btn-2">
-                    <a class="fb" href="#"><i class="ion-social-facebook"></i>Facebook</a>
-                    <a class="tw" href="#"><i class="ion-social-twitter"></i>twitter</a>
+                    <a class="fb" href=""><i class="ion-social-google"></i>Google</a>
+                    <a class="fb" href=""><i class="ion-social-facebook"></i>Facebook</a>
+                    <a class="tw" href=""><i class="ion-social-twitter"></i>twitter</a>
                 </div>
             </div>
+            {% endcomment %}
         </div>
     </div>
     <!--end of login form popup-->
@@ -62,7 +66,6 @@
                         <input type="text" name="username" id="username-2" placeholder="Hugh Jackman" pattern="^[a-zA-Z][a-zA-Z0-9-_\.]{8,20}$" required="required" />
                     </label>
                 </div>
-
                 <div class="row">
                     <label for="email-2">
                         your email:
@@ -116,11 +119,11 @@
                                 TV-Series <i class="fa fa-angle-down" aria-hidden="true"></i>
                                 </a>
                                 <ul class="dropdown-menu level1">
-                                    <li><a href="{% url 'movie_list' %}">All TV-Series</a></li>
-                                    <li><a href="index-2.html">Tajik TV-Series</a></li>
-                                    <li><a href="homev2.html">Turkish TV-Series</a></li>
-                                    <li><a href="homev3.html">Russian TV-Series</a></li>
-                                    <li><a href="{% url 'movie_list' %}">English TV-Series</a></li>
+                                    <li><a href="{% url 'tvseries_list' %}">All TV-Series</a></li>
+                                    <li><a href="{% url 'tvseries_list' %}?origin=TJ">Tajik TV-Series</a></li>
+                                    <li><a href="{% url 'tvseries_list' %}?origin=TR">Turkish TV-Series</a></li>
+                                    <li><a href="{% url 'tvseries_list' %}?origin=RU">Russian TV-Series</a></li>
+                                    <li><a href="{% url 'tvseries_list' %}?origin=US">English TV-Series</a></li>
                                 </ul>
                             </li>
                             <li class="dropdown first">
@@ -149,24 +152,10 @@
                                 <ul class="dropdown-menu level1">
                                     {% for g in genres_context %}
                                     <li><a href="{% url 'movie_list' %}?genres={{ g.id }}">{{ g.title }}</a></li>
-{#                                    <li><a href="{% url 'movie_list' %}?genres=22">ADVENTURE</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">ANIMATED</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">BIOGRAPHY</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">COMEDY</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">CRIME</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">DRAMA</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">FANTASY</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HISTORICAL</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HISTORY</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">HORROR</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">MUSICAL</a></li>#}
-{#                                    <li><a href="{% url 'movie_list' %}?genres=4">ROMANCE</a></li>#}
-{#                                    <li><a href="celebritygrid02.html">celebrity grid 02 </a></li>#}
-{#                                    <li><a href="celebritylist.html">celebrity list</a></li>#}
-{#                                    <li class="it-last"><a href="celebritysingle.html">celebrity single</a></li>#}
                                     {% endfor %}
                                 </ul>
                             </li>
+                            {% comment %}
                             <!--<li class="dropdown first">
                                 <a class="btn btn-default dropdown-toggle lv1" data-toggle="dropdown" data-hover="dropdown">
                                 news <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -188,8 +177,43 @@
                                     <li class="it-last"><a href="userrate.html">user rate</a></li>
                                 </ul>
                             </li>-->
+                            {% endcomment %}
                         </ul>
                         <ul class="nav navbar-nav flex-child-menu menu-right">
+                            {% if user.is_authenticated %}
+                                <li class="dropdown first">
+                                    <a class="btn btn-default dropdown-toggle lv1" data-toggle="dropdown" data-hover="dropdown">
+                                    profile <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                    </a>
+                                    <ul class="dropdown-menu level1">
+                                        {% if user.is_staff %}
+                                            <li><a href="{% url 'admin:index' %}">admin page</a></li>
+                                        {% endif %}
+                                        <li><a href="{% url "profile_view" %}">Profile</a></li>
+                                        <li><a href="#">Favorite Movies</a></li>
+                                        <li class="it-last"><a href="{% url 'account_logout' %}">Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                                    </ul>
+                                </li>
+                                <a href="{% url "profile_view" %}">
+                                    <span class="logged-in-user">
+                                        {% for profile in user_profile_context %}
+                                            {% if profile.user.username == user.username %}
+                                                {% if profile.avatar %}
+                                                    <div class="round-image-container">
+                                                        <div class="rounded-image" style="background-image: url('{{ profile.avatar.url }}');"></div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="round-image-container">
+                                                        <div class="rounded-image" style="background-image: url('{% static "images/userdefault.jpg" %}');"></div>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="user-profile">{{ profile.user.username }} </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </a>
+                            {% else %}
+                            {% comment %}
                             <!--<li class="dropdown first">
                                 <a class="btn btn-default dropdown-toggle lv1" data-toggle="dropdown" data-hover="dropdown">
                                 pages <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -201,20 +225,25 @@
                                 </ul>
                             </li>
                             <li><a href="#">Help</a></li>-->
-                            <li class="loginLink"><a href="#">LOG In</a></li>
-                            <li class="btn signupLink"><a href="#">sign up</a></li>
+                            {% endcomment %}
+                                <li class="loginLink"><a href="#">LOG In</a></li>
+                                <li class="btn"><a href="{% url 'account_signup' %}">sign up</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 <!-- /.navbar-collapse -->
             </nav>
             <!-- search form -->
+            <form method="get" action="{% url 'search_results' %}">
                 <div class="top-search">
-	    	        <select>
-				        <option value="united">TV show</option>
-				        <option value="saab">Others</option>
-			        </select>
-			        <input type="text" placeholder="Search for a movie, TV Show or celebrity that you are looking for">
-	            </div>
+                    <select name="search-for">
+                        <option value="movies" {% if search_option == "movies" %}selected{% endif %}>Movies</option>
+                        <option value="tv-series" {% if search_option == "tv-series" %}selected{% endif %}>TV Series</option>
+                    </select>
+                    <input name="search" type="text" value="{{ search_query }}" placeholder="Search for a movie or TV show" pattern=".{3,}" title="Please enter at least 3 characters">
+                    <input type="submit" value="Search">
+                </div>
+            </form>
             </div>
 
     </header>

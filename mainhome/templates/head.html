@@ -38,6 +38,10 @@
     {% block content %}
 
     {% endblock %}
+
+    {% block extra_body %}
+
+    {% endblock %}
     {% include 'footer.html' %}
 
 
@@ -47,5 +51,34 @@
     <script src="{% static 'js/plugins2.js'%}"></script>
     <script src="{% static 'js/custom.js'%}"></script>
     <script src="{% static 'js/myjs.js'%}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.add-to-favorite').click(function(e) {
+                e.preventDefault();
+
+                var movieId = $(this).data('movie-id');
+                var button = $(this);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/profile/add-to-favorite/',
+                    data: {
+                        'movie_id': movieId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        if (response.added) {
+                            button.html('<i class="ion-checkmark"></i> Added to Favorite');
+                        } else {
+                            button.html('<i class="ion-heart"></i> Add to Favorite');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 {% extends 'head.html' %}
-{% block head_title %}SUHA{% endblock %}
+{% block head_title %}MOVIEFY HOME{% endblock %}
 {% block content %}
 
     <!--preloading-->
@@ -21,79 +21,165 @@
                 <div class="slider-single-item">
                     {% for i in carousel_list %}
                         {% if i.status != 'd' %}
-                            <div class="movie-item">
-                                <div class="row">
-                                    <div class="col-md-8 col-sm-12 col-xs-12">
-                                        <div class="title-in">
-                                            <div class="cate">
-                                                {% for j in i.to_movie.movie_genre.all %}
-                                                    {% if j.title == 'Sci-fi' %}
-                                                        <span class="blue"><a href="#">Sci-fi</a></span>
-                                                    {% elif j.title == 'Action' %}
-                                                        <span class="yell"><a href="#">Action</a></span>
-                                                    {% elif j.title == 'Advanture' %}
-                                                        <span class="orange"><a href="#">Advanture</a></span>
-                                                    {% elif j.title == 'Animated' %}
-                                                        <span class="blue"><a href="#">Animation</a></span>
-                                                    {% elif j.title == 'Comedy' %}
-                                                        <span class="yell"><a href="#">Comedy</a></span>
-                                                    {% elif j.title == 'Crime' %}
-                                                        <span class="green"><a href="#">Crime</a></span>
-                                                    {% elif j.title == 'Drama' %}
-                                                        <span class="blue"><a href="#">Drama</a></span>
-                                                    {% elif j.title == 'Fantasy' %}
-                                                        <span class="yell"><a href="#">Fantasy</a></span>
-                                                    {% elif j.title == 'Historical' %}
-                                                        <span class="orange"><a href="#">Historical</a></span>
-                                                    {% elif j.title == 'Horror' %}
-                                                        <span class="blue"><a href="#">Horror</a></span>
-                                                    {% elif j.title == 'Musical' %}
-                                                        <span class="yell"><a href="#">Musical</a></span>
-                                                    {% elif j.title == 'Romance' %}
-                                                        <span class="orange"><a href="#">Romance</a></span>
-                                                    {% elif j.title == 'Thriller' %}
-                                                        <span class="yell"><a href="#">Thriller</a></span>
-                                                    {% elif j.title == 'Western' %}
-                                                        <span class="orange"><a href="#">Western</a></span>
+                            {% if i.to_movie %}
+                                <div class="movie-item">
+                                    <div class="row">
+                                        <div class="col-md-8 col-sm-12 col-xs-12">
+                                            <div class="title-in">
+                                                <div class="cate">
+                                                    {% for j in i.to_movie.genre.all %}
+                                                        {% if j.title == 'Sci-fi' %}
+                                                            <span class="blue"><a href="#">Sci-fi</a></span>
+                                                        {% elif j.title == 'Action' %}
+                                                            <span class="yell"><a href="#">Action</a></span>
+                                                        {% elif j.title == 'Adventure' %}
+                                                            <span class="orange"><a href="#">Adventure</a></span>
+                                                        {% elif j.title == 'Animated' %}
+                                                            <span class="blue"><a href="#">Animation</a></span>
+                                                        {% elif j.title == 'Comedy' %}
+                                                            <span class="yell"><a href="#">Comedy</a></span>
+                                                        {% elif j.title == 'Crime' %}
+                                                            <span class="green"><a href="#">Crime</a></span>
+                                                        {% elif j.title == 'Drama' %}
+                                                            <span class="blue"><a href="#">Drama</a></span>
+                                                        {% elif j.title == 'Fantasy' %}
+                                                            <span class="yell"><a href="#">Fantasy</a></span>
+                                                        {% elif j.title == 'Historical' %}
+                                                            <span class="orange"><a href="#">Historical</a></span>
+                                                        {% elif j.title == 'Horror' %}
+                                                            <span class="blue"><a href="#">Horror</a></span>
+                                                        {% elif j.title == 'Musical' %}
+                                                            <span class="yell"><a href="#">Musical</a></span>
+                                                        {% elif j.title == 'Romance' %}
+                                                            <span class="orange"><a href="#">Romance</a></span>
+                                                        {% elif j.title == 'Thriller' %}
+                                                            <span class="yell"><a href="#">Thriller</a></span>
+                                                        {% elif j.title == 'Western' %}
+                                                            <span class="orange"><a href="#">Western</a></span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <h1><a href="{{ i.to_movie.get_absolute_url }}" tabindex="0">{{ i.to_movie.title}}<br>
+                                                <span>{{ i.to_movie.year}}</span></a></h1>
+                                                <div class="social-btn">
+                                                    <a href="{{ i.to_movie.get_absolute_url }}" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
+                                                    {% if user.is_authenticated  %}
+                                                        {% if i.to_movie.id in favorite_movies %}
+                                                            <a href="#" class="parent-btn add-to-favorite checked" data-movie-id="{{ i.to_movie.id }}"><i class="ion-checkmark"></i> Added to Favorite</a>
+                                                        {% else %}
+                                                            <a href="#" class="parent-btn add-to-favorite" data-movie-id="{{ i.to_movie.id }}"><i class="ion-heart"></i> Add to Favorite</a>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <a href="{% url "account_login" %}" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
                                                     {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                            <h1><a href="{{ i.to_movie.get_absolute_url }}" tabindex="0">{{ i.to_movie.title}}<br>
-                                            <span>{{ i.to_movie.year}}</span></a></h1>
-                                            <div class="social-btn">
-                                                <a href="{{ i.to_movie.trailer_url }}" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
-                                                <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
-                                                <div class="hover-bnt">
-                                                    <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
-                                                    <div class="hvr-item">
-                                                        <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
-                                                        <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
-                                                        <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
-                                                        <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                                                    <div class="hover-bnt">
+                                                        <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
+                                                        <div class="hvr-item">
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="mv-details">
-                                                <p><i class="ion-android-star"></i><span>{{ i.to_movie.movie_imdb }}</span> /10</p>
-                                                <ul class="mv-infor">
-                                                    <li>  Run Time: {{ i.to_movie.duration }} </li>
-                                                    <li>  Rated: {{ i.to_movie.MPAA_rating }}  </li>
-                                                    <li>  Release: {{ i.to_movie.release_date }}</li>
-                                                </ul>
-                                            </div>
-                                            <div class="btn-transform transform-vertical">
-                                                <div><a href="{{ i.to_movie.get_absolute_url }}" class="item item-1 redbtn">more detail</a></div>
-                                                <div><a href= "{{ i.to_movie.get_absolute_url }}" class="item item-2 redbtn hvrbtn">more detail</a></div>
+                                                <div class="mv-details">
+                                                    <p><i class="ion-android-star"></i><span>{{ i.to_movie.movie_imdb }}</span> /10</p>
+                                                    <ul class="mv-infor">
+                                                        <li>  Run Time: {{ i.to_movie.run_time }} m </li>
+                                                        <li>  Rated: {{ i.to_movie.MPAA_rating }}  </li>
+                                                        <li>  Release: {{ i.to_movie.release_date }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="btn-transform transform-vertical">
+                                                    <div><a href="{{ i.to_movie.get_absolute_url }}" class="item item-1 redbtn">more detail</a></div>
+                                                    <div><a href= "{{ i.to_movie.get_absolute_url }}" class="item item-2 redbtn hvrbtn">more detail</a></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xs-12">
-                                        <div class="mv-img-2">
-                                            <a href="{{ i.to_movie.get_absolute_url }}"><img src="{{ i.to_movie.poster.url }}" alt="movie"></a>
+                                        <div class="col-md-4 col-sm-12 col-xs-12">
+                                            <div class="mv-img-2">
+                                                <a href="{{ i.to_movie.get_absolute_url }}"><img src="{{ i.to_movie.poster.url }}" alt="movie"></a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% elif i.to_series %}
+                                <div class="movie-item">
+                                    <div class="row">
+                                        <div class="col-md-8 col-sm-12 col-xs-12">
+                                            <div class="title-in">
+                                                <div class="cate">
+                                                    {% for j in i.to_series.genre.all %}
+                                                        {% if j.title == 'Sci-fi' %}
+                                                            <span class="blue"><a href="#">Sci-fi</a></span>
+                                                        {% elif j.title == 'Action' %}
+                                                            <span class="yell"><a href="#">Action</a></span>
+                                                        {% elif j.title == 'Adventure' %}
+                                                            <span class="orange"><a href="#">Adventure</a></span>
+                                                        {% elif j.title == 'Animated' %}
+                                                            <span class="blue"><a href="#">Animation</a></span>
+                                                        {% elif j.title == 'Comedy' %}
+                                                            <span class="yell"><a href="#">Comedy</a></span>
+                                                        {% elif j.title == 'Crime' %}
+                                                            <span class="green"><a href="#">Crime</a></span>
+                                                        {% elif j.title == 'Drama' %}
+                                                            <span class="blue"><a href="#">Drama</a></span>
+                                                        {% elif j.title == 'Fantasy' %}
+                                                            <span class="yell"><a href="#">Fantasy</a></span>
+                                                        {% elif j.title == 'Historical' %}
+                                                            <span class="orange"><a href="#">Historical</a></span>
+                                                        {% elif j.title == 'Horror' %}
+                                                            <span class="blue"><a href="#">Horror</a></span>
+                                                        {% elif j.title == 'Musical' %}
+                                                            <span class="yell"><a href="#">Musical</a></span>
+                                                        {% elif j.title == 'Romance' %}
+                                                            <span class="orange"><a href="#">Romance</a></span>
+                                                        {% elif j.title == 'Thriller' %}
+                                                            <span class="yell"><a href="#">Thriller</a></span>
+                                                        {% elif j.title == 'Western' %}
+                                                            <span class="orange"><a href="#">Western</a></span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if i.description %}
+                                                        <span class="orange"><a href="{{ i.to_series.get_absolute_url }}">{{ i.description }}</a></span>
+                                                    {% endif %}
+                                                </div>
+                                                <h1><a href="{{ i.to_series.get_absolute_url }}" tabindex="0">{{ i.to_series.title}}<br>
+                                                <span>{{ i.to_series.release_year}}</span></a></h1>
+                                                <div class="social-btn">
+                                                    <a href="{{ i.to_series.get_absolute_url }}" class="parent-btn"><i class="ion-play"></i> Watch Trailer</a>
+                                                    <a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
+                                                    <div class="hover-bnt">
+                                                        <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
+                                                        <div class="hvr-item">
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
+                                                            <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mv-details">
+                                                    <p><i class="ion-android-star"></i><span>{{ i.to_series.rating }}</span> /10</p>
+                                                    <ul class="mv-infor">
+                                                        <li>  Rated: {{ i.to_series.MPAA_rating }}  </li>
+                                                        <li>  Release: {{ i.to_series.release_date }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="btn-transform transform-vertical">
+                                                    <div><a href="{{ i.to_series.get_absolute_url }}" class="item item-1 redbtn">more detail</a></div>
+                                                    <div><a href= "{{ i.to_series.get_absolute_url }}" class="item item-2 redbtn hvrbtn">more detail</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12 col-xs-12">
+                                            <div class="mv-img-2">
+                                                <a href="{{ i.to_series.get_absolute_url }}"><img src="{{ i.to_series.poster.url }}" alt="series"></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
 
@@ -537,7 +623,6 @@
     <!-- end of footer v2 section-->
 
     <!-- js -->
-
 
 {% endblock %}
 

@@ -9,12 +9,14 @@ from imdb import IMDb
 from django.core.paginator import Paginator
 import nltk
 from nltk.corpus import stopwords
+from mainhome.models import Profile, FavoriteMovie
 
 nltk.download('stopwords')
 STOPWORDS = set(stopwords.words('english'))
 
 
 def watch_movie(request, slug):
+    user = request.user
     movie = get_object_or_404(Movie, slug=slug)
     cast = movie.cast.all()[::-1]
     role = ActorRoleByMovie.objects.filter(movie=movie)
@@ -24,12 +26,17 @@ def watch_movie(request, slug):
     daily_views.save()
     movie.movie_view_count += 1
     movie.save()
+    favorite_movies = []
+    if user.is_authenticated:
+        user_profile = Profile.objects.get(user=user)
+        favorite_movies = FavoriteMovie.objects.filter(user_profile=user_profile).values_list('movie_id', flat=True)
     if movie.imdb_id and len(cast) < 15:
         ia = IMDb()
         movie_from_imdb = ia.get_movie(movie.imdb_id)
         cast = movie_from_imdb.get("cast")
     movie_urls = WatchMovieUrl.objects.filter(movie=movie)
-    return render(request, 'moviedetailed.html', {'movie': movie, 'cast': cast, 'role': role, "movie_urls": movie_urls})
+    return render(request, 'moviedetailed.html', {'movie': movie, 'cast': cast, 'role': role, "movie_urls": movie_urls,
+                                                  'favorite_movies': favorite_movies})
 
 
 def watch_series(request, series_slug):
@@ -241,7 +248,7 @@ class MovieListView(ListView):
 class TVSeriesListView(ListView):
     model = TVSeries
     template_name = 'tvseriesgrid.html'
-    context_object_name = 'tvseries'
+    context_object_name = 'movies'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -255,7 +262,7 @@ class TVSeriesListView(ListView):
             title_q = Q(title__icontains=search_query)
             desc_q = Q()
             for token in tokens:
-                desc_q &= Q(plot_summary__icontains=token)
+                desc_q &= Q(description__icontains=token)
             # Combine title and description queries using OR
             queryset = queryset.filter(title_q | desc_q)
         # filter by genre
@@ -266,39 +273,39 @@ class TVSeriesListView(ListView):
         rating = self.request.GET.get('rating')
         if rating:
             if rating == '5':
-                queryset = queryset.filter(movie_imdb__gte=5)
+                queryset = queryset.filter(rating__gte=5)
             elif rating == '6':
-                queryset = queryset.filter(movie_imdb__gte=6)
+                queryset = queryset.filter(rating__gte=6)
             elif rating == '7':
-                queryset = queryset.filter(movie_imdb__gte=7)
+                queryset = queryset.filter(rating__gte=7)
             elif rating == '8':
-                queryset = queryset.filter(movie_imdb__gte=8)
+                queryset = queryset.filter(rating__gte=8)
             elif rating == '9':
-                queryset = queryset.filter(movie_imdb__gte=9)
+                queryset = queryset.filter(rating__gte=9)
         # filter by year
         year_f = self.request.GET.get('year-from')
         year_t = self.request.GET.get('year-to')
         if year_f:
-            queryset = queryset.filter(year__gte=year_f)
+            queryset = queryset.filter(release_year__gte=year_f)
         if year_t:
-            queryset = queryset.filter(year__lte=year_t)
+            queryset = queryset.filter(release_year__lte=year_t)
         # sort by
         sort_by = self.request.GET.get('sort-by')
         if sort_by:
             if sort_by == 'recommended':
                 queryset = queryset
             elif sort_by == 'rating-d':
-                queryset = queryset.order_by('-movie_imdb')
+                queryset = queryset.order_by('-rating')
             elif sort_by == 'rating-a':
-                queryset = queryset.order_by('movie_imdb')
+                queryset = queryset.order_by('rating')
             elif sort_by == 'latest-d':
                 queryset = queryset.order_by('-created')
             elif sort_by == 'latest-a':
                 queryset = queryset.order_by('created')
             elif sort_by == 'year-d':
-                queryset = queryset.order_by('-year')
+                queryset = queryset.order_by('-release_year')
             elif sort_by == 'year-a':
-                queryset = queryset.order_by('year')
+                queryset = queryset.order_by('release_year')
         # origin
         origin = self.request.GET.get('origin')
         if origin:

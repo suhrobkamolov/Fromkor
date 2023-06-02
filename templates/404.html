@@ -1,0 +1,22 @@
+{% extends 'head.html' %}
+{% block head_title %}{{ user.username }} favorite {% endblock %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+
+    <div class="page-single-2">
+        <div class="container">
+            <div class="row">
+                <div class="middle-content">
+                    <a href="{% url "home" %}"><img class="md-logo" src="{% static "images/moviefy-logo/png/logo-no-background.png" %}" alt="logo" width="119px" height="58px"></a>
+                    <img src="{% static 'images/err-img.png' %}" alt="404">
+                    <h1>Page not found</h1>
+                    <a href="{% url "home" %}" class="redbtn">go home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

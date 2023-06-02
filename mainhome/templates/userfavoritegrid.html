@@ -1,0 +1,107 @@
+{% extends 'head.html' %}
+{% block head_title %}{{ user.username }} favorite {% endblock %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+
+    <div class="hero user-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-ct">
+                        <h1>{% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}’s profile</h1>
+                        <ul class="breadcumb">
+                            <li class="active"><a href="{% url "home" %}">Home</a><span class="ion-ios-arrow-right"></span></li>
+                            <li class="active"><a href="{% url "profile_view" %}">Profile</a></li>
+                            <li> <span class="ion-ios-arrow-right"></span>Faovrite Movies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-single">
+        <div class="container">
+            <div class="row ipad-width2">
+                {% include "account/user_sidebar.html" %}
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <form method="get" action="">
+                        <div class="topbar-filter user">
+                            <p>You liked <span>{{ movies|length }} movies</span> in total</p>
+                            <label>Sort by:</label>
+                            <select name="sort-by" onchange="this.form.submit()">
+                                <option value="recommended" {% if sort_by == 'recommended' %}selected{% endif %}>Recommended</option>
+                                <option value="rating-d" {% if sort_by == 'rating-d' %}selected{% endif %}>Rating Descending &#x2193;</option>
+                                <option value="rating-a" {% if sort_by == 'rating-a' %}selected{% endif %}>Rating Ascending &#x2191;</option>
+                                <option value="latest-d" {% if sort_by == 'latest-d' %}selected{% endif %}>Latest Added Descending &#x2193;</option>
+                                <option value="latest-a" {% if sort_by == 'latest-a' %}selected{% endif %}>Latest Added Ascending &#x2191;</option>
+                                <option value="year-d" {% if sort_by == 'year-d' %}selected{% endif %}>Release Year Descending &#x2193;</option>
+                                <option value="year-a" {% if sort_by == 'year-a' %}selected{% endif %}>Release Year Ascending &#x2191;</option>
+                            </select>
+                            {% comment %}
+                            <a href="userfavoritelist.html" class="list"><i class="ion-ios-list-outline "></i></a>
+                            <a  href="userfavoritegrid.html" class="grid"><i class="ion-grid active"></i></a>
+                            {% endcomment %}
+                        </div>
+                    </form>
+                    <div>
+                        {% if movies|length != 0 %}
+                            <div class="flex-wrap-movielist grid-fav">
+                                {% for m in movies %}
+                                    <div class="movie-item-style-2 movie-item-style-1 style-3">
+                                        <img src="{{ m.movie.poster.url }}" alt="{{ m.movie.title }}">
+                                        <div class="hvr-inner">
+                                            <a  href="{{ m.movie.get_absolute_url }}"> Read more <i class="ion-android-arrow-dropright"></i> </a>
+                                        </div>
+                                        <div class="mv-item-infor">
+                                            <h6><a href="{{ m.movie.get_absolute_url }}">{{ m.movie.title }} {{ m.movie.year }}</a></h6>
+                                            <p class="rate"><i class="ion-android-star"></i><span>{{ m.movie.movie_imdb }}</span> /10</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                <div class="center" style="display: flex; flex-direction: column; align-items: center;">
+                                <img src="{% static 'images/confused.gif' %}" alt="confused">
+                                <div class="mv-item-infor">
+                                    <h3>You did not like any movie!</h3>
+                                </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <form method="get" action="">
+                        <div class="topbar-filter">
+                            <label>Movies per page:</label>
+                            <label>
+                                <select name="page_size" onchange="this.form.submit()" disabled>
+                                    <option value="24" {% if movies_per_page == 24 %}selected{% endif %}>24</option>
+                                </select>
+                                <noscript><input type="submit" value="Submit"></noscript>
+                            </label>
+
+                            <div class="pagination2">
+                                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}:</span>
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort-by={{ sort_by }}{% endif %}"><i class="ion-arrow-left-b"> Previous </i></a>
+                                {% else %}
+                                    <a class="disabled"><i class="ion-arrow-left-b"> Previous </i></a>
+                                {% endif %}
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort-by={{ sort_by }}{% endif %}"> Next <i class="ion-arrow-right-b"></i></a>
+                                {% else %}
+                                    <a class="disabled"> Next <i class="ion-arrow-right-b"></i></a>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
