@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.files.base import ContentFile
 from django.db import models
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from .models import Genre, Company, Producer, Actor, Movie, DailyMovieViews, TVSeries,\
@@ -126,53 +127,64 @@ admin.site.register(Genre, GenreAdmin)
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'release_date', "is_active"]
+    list_display = ['title', 'slug', 'release_date', 'is_active']
     list_filter = ['created', 'updated', 'genre']
     list_editable = ['is_active', ]
     list_per_page = 50
     ordering = ['-created']
-    search_fields = ['title', 'plot_summary', ]
+    search_fields = ['title', 'plot_summary']
     exclude = ('created_at', 'updated_at',)
     prepopulated_fields = {'slug': ('title',)}
 
     def save_model(self, request, obj, form, change):
-        if obj.poster:
-            image = Image.open(obj.poster.path)
-            image = image.resize((285, 437), Image.ANTIALIAS)
-            image.save(obj.poster.path)
-            super().save_model(request, obj, form, change)
-        elif obj.poster_url:
-            url = obj.poster_url
-            response = requests.get(url)
-            image = Image.open(BytesIO(response.content))
-            image = image.resize((285, 437), Image.ANTIALIAS)
-            filestream = BytesIO()
-            image.save(filestream, 'JPEG')
-            filestream.seek(0)
-            obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
-            super().save_model(request, obj, form, change)
-
-        if change:  # if editing an existing object
+        if not change:
+            # Creating a new movie object
+            if not obj.poster and obj.poster_url:
+                # No poster uploaded but poster_url is provided
+                try:
+                    response = requests.get(obj.poster_url)
+                    img = Image.open(BytesIO(response.content))
+                    img = img.resize((285, 437), Image.ANTIALIAS)
+                    img_io = BytesIO()
+                    img.save(img_io, format='JPEG')
+                    obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
+                    obj.poster_url = ''
+                except Exception as e:
+                    print(f'Error downloading image: {e}')
+            elif obj.poster:
+                img = Image.open(obj.poster)
+                img = img.resize((285, 437), Image.ANTIALIAS)
+                img_io = BytesIO()
+                img.save(img_io, format='JPEG')
+                obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
+        else:
             old_obj = Movie.objects.get(pk=obj.pk)
-            if old_obj.poster:
-                # if obj.poster:
-                #     old_obj.poster.delete(save=False)
-                #     image = Image.open(obj.poster.path)
-                #     image = image.resize((285, 437), Image.ANTIALIAS)
-                #     image.save(obj.poster.path)
-                #     super().save_model(request, obj, form, change)
-                if obj.poster_url:
+            # Updating an existing movie object
+            if 'poster' in form.changed_data and obj.poster != old_obj.poster:
+                # New poster uploaded
+                if old_obj.poster:
                     old_obj.poster.delete(save=False)
-                    url = obj.poster_url
-                    response = requests.get(url)
-                    image = Image.open(BytesIO(response.content))
-                    image = image.resize((285, 437), Image.ANTIALIAS)
-                    filestream = BytesIO()
-                    image.save(filestream, 'JPEG')
-                    filestream.seek(0)
-                    obj.poster.save(obj.poster_url.split('/')[-1], File(filestream), save=False)
-                    super().save_model(request, obj, form, change)
-
+                img = Image.open(form.cleaned_data['poster'])
+                img = img.resize((285, 437), Image.ANTIALIAS)
+                img_io = BytesIO()
+                img.save(img_io, format='JPEG')
+                obj.poster.delete(save=False)
+                obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
+            elif obj.poster_url:
+                if old_obj.poster:
+                    old_obj.poster.delete(save=False)
+                # New poster URL provided
+                try:
+                    obj.poster.delete(save=False)
+                    response = requests.get(obj.poster_url)
+                    img = Image.open(BytesIO(response.content))
+                    img = img.resize((285, 437), Image.ANTIALIAS)
+                    img_io = BytesIO()
+                    img.save(img_io, format='JPEG')
+                    obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
+                    obj.poster_url = ''
+                except Exception as e:
+                    print(f'Error downloading image: {e}')
         super().save_model(request, obj, form, change)
 
 

@@ -1,11 +1,22 @@
+from io import BytesIO
+from PIL import Image
+from django.core.files.storage import default_storage
 from django.db import models
 from django.conf import settings
-from allauth.account.signals import user_logged_in, user_signed_up
 from django_countries.fields import CountryField
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from Movies.models import Movie, TVSeries
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.core.exceptions import ValidationError
+
+
+def validate_image_size(value):
+    # Specify the maximum file size in bytes
+    max_size = 10 * 1024 * 1024  # 10 MB
+
+    if value.size > max_size:
+        raise ValidationError("The file size exceeds the maximum limit of 10 MB.")
 
 STATUS_CHOICES = (
     ('M1', 'Movie1'),
@@ -44,7 +55,7 @@ class Profile(models.Model):
     country = CountryField(blank_label="(select country)", multiple=False, blank=True, null=True)
     profile_favorite_movies = models.ManyToManyField(Movie, through='FavoriteMovie', blank=True, related_name='user_favorite_movies')
     favorite_tvseries = models.ManyToManyField(TVSeries, through='FavoriteTVSeries', blank=True, related_name="users_favorite_tvseries")
-    avatar = models.ImageField(upload_to=upload_file_name, blank=True, null=True)
+    avatar = models.ImageField(upload_to=upload_file_name, validators=[validate_image_size], blank=True, null=True)
 
     def __str__(self):
         return self.user.username

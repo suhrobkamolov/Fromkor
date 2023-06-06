@@ -36,7 +36,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECRET_KEY = 'django-insecure-$7i7f++l$8ko5t0f8+#vaw&i90q*=lku&#^2^=8kh5yjfrg_z+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # ... include the providers you want to enable:
     # 'allauth.socialaccount.providers.twitter',
+    'storages',  # for AWS
 ]
 
 # Provider specific settings
@@ -197,3 +198,15 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'moviefymovie@gmail.com'  # Replace with your Gmail email address
 EMAIL_HOST_PASSWORD = 'zillkirhiueyflgp'  # Replace with your Gmail password or app-specific password
 
+# AWS
+
+# settings.py
+
+AWS_ACCESS_KEY_ID = 'AKIASERXPYECKC4ABB6S'
+AWS_SECRET_ACCESS_KEY = 'XaAgOLZ1NLkIjBjmSeVQGldIQJ49J5pRdl7UmcQP'
+AWS_STORAGE_BUCKET_NAME = 'moviefy-django'
+AWS_S3_REGION_NAME = 'eu-central-1'
+
+# Use the S3 storage backend for media files
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'Fromkor.storage_backends.MediaStorage'
