@@ -162,8 +162,6 @@ class MovieAdmin(admin.ModelAdmin):
             # Updating an existing movie object
             if 'poster' in form.changed_data and obj.poster != old_obj.poster:
                 # New poster uploaded
-                if old_obj.poster:
-                    old_obj.poster.delete(save=False)
                 img = Image.open(form.cleaned_data['poster'])
                 img = img.resize((285, 437), Image.ANTIALIAS)
                 img_io = BytesIO()
@@ -171,11 +169,7 @@ class MovieAdmin(admin.ModelAdmin):
                 obj.poster.delete(save=False)
                 obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
             elif obj.poster_url:
-                if old_obj.poster:
-                    old_obj.poster.delete(save=False)
-                # New poster URL provided
                 try:
-                    obj.poster.delete(save=False)
                     response = requests.get(obj.poster_url)
                     img = Image.open(BytesIO(response.content))
                     img = img.resize((285, 437), Image.ANTIALIAS)
