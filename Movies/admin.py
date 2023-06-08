@@ -44,14 +44,14 @@ class TVSeriesAdmin(admin.ModelAdmin):
         if change:  # if editing an existing object
             old_obj = TVSeries.objects.get(pk=obj.pk)
             if 'poster' in form.changed_data:
-                if obj.poster != old_obj.poster:  # if poster field has changed
-                    # check if old_obj.poster exists, and prompt user to confirm overwriting
-                    if old_obj.poster:
-                        old_obj.poster.delete(save=False)
+                # if obj.poster != old_obj.poster:  # if poster field has changed
+                #     # check if old_obj.poster exists, and prompt user to confirm overwriting
+                #     if old_obj.poster:
+                #         old_obj.poster.delete(save=False)
                 super().save_model(request, obj, form, change)
             elif obj.poster_url:
-                if old_obj.poster:
-                    old_obj.poster.delete(save=False)
+                # if old_obj.poster:
+                #     old_obj.poster.delete(save=False)
                 self.poster_url_change(obj)
                 super().save_model(request, obj, form, change)
         else:
@@ -80,11 +80,11 @@ class EpisodeAdmin(admin.ModelAdmin):
         if change:  # if editing an existing object
             old_obj = Episode.objects.get(pk=obj.pk)
             if 'cover' in form.changed_data:
-                old_obj.cover.delete(save=False)
+                # old_obj.cover.delete(save=False)
                 super().save_model(request, obj, form, change)
             elif obj.cover_url:
-                if old_obj.cover:
-                    old_obj.cover.delete(save=False)
+                # if old_obj.cover:
+                #     old_obj.cover.delete(save=False)
                 url = obj.cover_url
                 response = requests.get(url)
                 image = Image.open(BytesIO(response.content))
@@ -166,7 +166,6 @@ class MovieAdmin(admin.ModelAdmin):
                 img = img.resize((285, 437), Image.ANTIALIAS)
                 img_io = BytesIO()
                 img.save(img_io, format='JPEG')
-                obj.poster.delete(save=False)
                 obj.poster.save(f'{obj.title}.jpg', ContentFile(img_io.getvalue()), save=False)
             elif obj.poster_url:
                 try:
