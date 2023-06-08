@@ -1,0 +1,38 @@
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Database
+db.sqlite3
+
+# Development and debugging files
+.vscode/
+.idea/
+*.pydevproject
+*.pycproject
+.pycrafterrc
+.pycharm/
+.coverage
+.pytest_cache/
+
+# Logs and temporary files
+*.log
+logs/
+*.swp
+*.swo
+
+# Secret and sensitive information
+settings_local.py
+*.secret_key
+*.env
+
+# Miscellaneous
+node_modules/
+.DS_Store
